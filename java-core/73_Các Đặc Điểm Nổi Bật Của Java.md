@@ -1,175 +1,113 @@
-# Các Đặc Điểm Nổi Bật Của Java
+# Các Đặc Điểm Nổi Bật Của Java 17
 
-**Java 19** (phát hành tháng 9/2022), tập trung vào các tính năng chính (JEP) theo nhóm **preview / incubator / ổn định** để bạn có thể dùng làm tài liệu giảng dạy hoặc nghiên cứu.
+**Java 17** được phát hành vào tháng 9 năm 2021 là một phiên bản hỗ trợ dài hạn (LTS), nghĩa là nó sẽ nhận được hỗ trợ rộng rãi từ nhà phát triển và cộng đồng Java. Phiên bản này mang lại nhiều cải tiến và tính năng mới cho ngôn ngữ và nền tảng, giúp tăng năng suất, hiệu suất và bảo mật cho lập trình viên.  
+ 
 
-### **1\. Record Patterns (Preview – JEP 405)**
+Những tính năng và thay đổi trên giúp Java 17 trở nên mạnh mẽ hơn, dễ bảo trì và an toàn hơn. Nếu bạn đang làm việc với Spring Boot hoặc các framework khác thì các lớp sealed, pattern matching và các cải tiến về quản lý bộ nhớ có thể cải thiện đáng kể hiệu suất và cấu trúc mã của bạn.
 
-*   Mở rộng **Pattern Matching** cho phép giải nén (deconstruct) dữ liệu trong **Record** trực tiếp.
+  
+ 
+
+### **1\. Lớp Sealed (JEP 409)**
+
+*   **Mục đích:** Lớp `sealed` hạn chế những lớp nào có thể mở rộng hoặc triển khai chúng, hữu ích khi xác định một tập hợp lớp con được phép.
     
-*   Giúp viết code ngắn gọn, dễ đọc khi làm việc với record.
+*   **Lợi ích:** Cung cấp nhiều kiểm soát hơn cho hệ thống phân cấp lớp, giúp mã dễ bảo trì hơn và an toàn hơn.
     
-
-📌 **Ví dụ trước đây:**
 
 ```java
-record Point(int x, int y) {}
+public abstract sealed class Shape
+    permits Circle, Square { }
 
-static void print(Object obj) {
-    if (obj instanceof Point p) {
-        int x = p.x();
-        int y = p.y();
-        System.out.println("x=" + x + ", y=" + y);
-    }
+public final class Circle extends Shape { }
+public final class Square extends Shape { }
+```
+
+### **2\. Pattern Matching cho switch (Preview) (JEP 406)**
+
+Mục đích: Nâng cao câu lệnh switch để hoạt động với các mẫu, cho phép so khớp mẫu trong các nhãn case.
+
+Lợi ích: Đơn giản hóa việc sử dụng câu lệnh switch, làm cho nó mạnh mẽ và dễ đọc hơn.
+
+```java
+switch (object) {
+    case String s -> System.out.println("Đây là chuỗi");
+    case Integer i -> System.out.println("Đây là số nguyên");
+    default -> System.out.println("Không rõ");
 }
 ```
 
-📌 **Java 19 với Record Patterns:**
+### **3\. Strong Encapsulation for JDK Internals (JEP 403)**
+
+*   **Mục đích:** Đóng gói chặt chẽ hơn các thành phần nội bộ của JDK theo mặc định, cải thiện bảo mật và tính modular.
+    
+*   **Chi tiết:** Theo mặc định việc truy cập phản chiếu bất hợp pháp vào các API nội bộ sẽ bị cấm trừ khi được phép rõ ràng.
+    
+
+### **4\. Context-Specific Deserialization Filters (JEP 415)**
+
+*   **Mục đích:** Cung cấp cơ chế để lọc dữ liệu phân giải đến nhằm ngăn chặn các lỗ hổng bảo mật do phân giải dữ liệu không an toàn.
+    
+*   **Chi tiết:** Bộ lọc cho phép chỉ định các loại đối tượng có thể được phân giải.
+    
+
+### **5\. Foreign Function & Memory API (Incubator) (JEP 412)**
+
+*   **Mục đích:** Giới thiệu API để gọi các hàm ngoại lai (không phải Java) và truy cập bộ nhớ ngoại lai ngoài heap JVM. Tính năng thử nghiệm này đơn giản hóa việc làm việc với mã native.
+    
+*   **Lợi ích:** Cung cấp một cách an toàn và hiệu quả hơn để làm việc với bộ nhớ native và giao diện hàm ngoại lai (FFI).
+    
+
+### **6\. Vector API (Second Incubator) (JEP 414)**
+
+*   **Mục đích:** Thử nghiệm lần hai của API Vector cho phép biểu diễn các tính toán vector và biên dịch ra các lệnh vector tối ưu trên phần cứng hỗ trợ (ví dụ: lệnh SIMD).
+    
+*   **Lợi ích:** Cải thiện hiệu suất của các tác vụ xử lý dữ liệu song song.
+    
+
+### **7\. Loại bỏ trình biên dịch AOT và JIT thử nghiệm (JEP 410)**
+
+Loại bỏ các tính năng biên dịch Ahead-of-Time (AOT) và Just-in-Time (JIT),vốn là các tính năng thử nghiệm và không được sử dụng rộng rãi.
+
+### **8\. Ngưng sử dụng API Applet để loại bỏ (JEP 398)**
+
+API Applet đã bị ngưng sử dụng và sẽ bị loại bỏ trong tương lai do các applet là công nghệ lỗi thời trong phát triển web hiện đại.
+
+### **9\. Cải tiến Bộ tạo Số Ngẫu nhiên Pseudo (JEP 356)**
+
+*   **Mục đích:** Thêm các giao diện và triển khai mới cho các bộ tạo số ngẫu nhiên (RNG), bao gồm các phương pháp dựa trên luồng và hỗ trợ các bộ tạo nhảy.
+    
+*   **Lợi ích:** Các tùy chọn RNG linh hoạt và có khả năng mở rộng hơn cho các trường hợp sử dụng nâng cao.
+    
 
 ```java
-record Point(int x, int y) {}
-
-static void print(Object obj) {
-    if (obj instanceof Point(int x, int y)) {
-        System.out.println("x=" + x + ", y=" + y);
-    }
-}
+RandomGenerator generator = RandomGeneratorFactory.of("L64X128MixRandom").create();
 ```
 
-👉 Ngắn gọn hơn, phù hợp với lập trình hàm.
+### **10\. Ngưng sử dụng Finalization (JEP 421)**
 
-### **2\. Pattern Matching for Switch (Second Preview – JEP 427)**
-
-*   Tiếp tục cải tiến từ Java 17/18.
+*   **Mục đích:** Finalization là một cơ chế dễ gặp lỗi khi dọn dẹp tài nguyên và việc sử dụng nó đang bị ngưng để ưu tiên các phương pháp đáng tin cậy hơn như `try-with-resources`.
     
-*   Cho phép `switch` hoạt động trực tiếp với kiểu dữ liệu phức tạp, thay vì chỉ primitive hoặc String.
+*   **Chi tiết:** Khuyến khích chuyển từ việc sử dụng `finalize()` sang các phương án thay thế như `Cleaner`.
     
 
-📌 **Ví dụ:**
+### **11\. Hỗ trợ MacOS/AArch64 (JEP 391)**
+
+Giới thiệu hỗ trợ cho kiến trúc Apple Silicon (AArch64) trên macOS, đảm bảo Java có thể chạy hiệu quả trên chip M1 của Apple.
+
+### **12\. Các Cải Tiến Nhỏ Khác**
+
+*   **Khối văn bản (từ Java 13 và 14):** Java 17 củng cố hỗ trợ cho các khối văn bản (chuỗi nhiều dòng), giúp cải thiện khả năng đọc của các văn bản định dạng như JSON hoặc SQL.
+    
+*   **Records:** Java 17 cải thiện thêm tính năng record, được giới thiệu trong Java 16, giúp tạo các lớp dữ liệu bất biến với ít mã thừa hơn.
+    
 
 ```java
-static String sample(Object obj) {
-    return switch (obj) {
-        case String s -> "Chuỗi có độ dài " + s.length();
-        case Integer i && i > 0 -> "Số nguyên dương " + i;
-        case null -> "Null";
-        default -> "Khác";
-    };
-}
+String json = """
+              {
+                "name": "Fox Dev",
+                "age": 18
+              }
+              """;
 ```
 
-👉 Linh hoạt, ngắn gọn, tránh nhiều `instanceof` lặp lại.
-
-### **3\. Virtual Threads (Preview – JEP 425)**
-
-*   Tính năng nổi bật nhất của Java 19 🎉.
-    
-*   **Virtual Thread**: một loại thread nhẹ do JVM quản lý (không gắn trực tiếp với OS thread).
-    
-*   Giúp xử lý **hàng triệu kết nối đồng thời** mà không tốn quá nhiều tài nguyên.
-    
-
-📌 **Ví dụ:**
-
-```java
-public class SampleVirtualThread {
-    public static void main(String[] args) throws InterruptedException {
-        Thread.startVirtualThread(() -> {
-            System.out.println("Hello từ Virtual Thread!");
-        }).join();
-    }
-}
-```
-
-📌 **Ứng dụng:**
-
-*   Server web, microservices, xử lý đồng thời khối lượng lớn request (giống Go’s goroutine).
-    
-*   Hướng tới **Project Loom** (lập trình concurrent dễ dàng hơn).
-    
-
-### **4\. Structured Concurrency (Incubator – JEP 428)**
-
-*   Cung cấp API giúp quản lý nhiều task chạy đồng thời dễ dàng hơn.
-    
-*   Giúp gom nhóm các thread ảo lại để quản lý lifecycle đồng bộ, dễ debug, dễ cancel.
-    
-
-📌 **Ví dụ:**
-
-```java
-import jdk.incubator.concurrent.*;
-
-try (var scope = new StructuredTaskScope.ShutdownOnFailure()) {
-    Future<String> user  = scope.fork(() -> findUser());
-    Future<Integer> order = scope.fork(() -> fetchOrders());
-
-    scope.join();           // chờ tất cả task
-    scope.throwIfFailed();  // ném exception nếu có lỗi
-
-    System.out.println(user.result() + " có " + order.result() + " đơn hàng.");
-}
-```
-
-👉 Code xử lý song song trở nên **an toàn, dễ đọc, dễ bảo trì**.
-
-### 5\. **Foreign Function & Memory API (Preview – JEP 424)**
-
-*   Tiếp tục thay thế **JNI**.
-    
-*   Cung cấp API để gọi code native và truy cập bộ nhớ ngoài heap.
-    
-*   Ở Java 19: nâng cấp từ incubator → preview.
-    
-
-📌 **Ví dụ:**
-
-```java
-import java.lang.foreign.*;
-
-public class FFMSample {
-    public static void main(String[] args) {
-        try (Arena arena = Arena.ofConfined()) {
-            MemorySegment segment = arena.allocate(100);
-            segment.setUtf8String(0, "Xin chào Java 19!");
-            System.out.println(segment.getUtf8String(0));
-        }
-    }
-}
-```
-
-👉 Quan trọng cho **AI, ML, đồ họa, high-performance computing**.
-
-### **6\. Vector API (Fourth Incubator – JEP 426)**
-
-*   API cho xử lý SIMD (vectorized computation).
-    
-*   Cho phép thao tác mảng số học hiệu năng cao hơn vòng lặp thường.
-    
-
-📌 **Ví dụ:**
-
-```java
-import jdk.incubator.vector.*;
-
-public class VectorSample {
-    public static void main(String[] args) {
-        var species = FloatVector.SPECIES_PREFERRED;
-        float[] a = {1, 2, 3, 4};
-        float[] b = {5, 6, 7, 8};
-        float[] c = new float[4];
-
-        var va = FloatVector.fromArray(species, a, 0);
-        var vb = FloatVector.fromArray(species, b, 0);
-        var vc = va.add(vb);
-        vc.intoArray(c, 0);
-
-        System.out.println(java.util.Arrays.toString(c)); // [6.0, 8.0, 10.0, 12.0]
-    }
-}
-```
-
-👉 Dùng nhiều trong **Big Data, AI/ML, xử lý ảnh, game engine**.
-
-### **✅ Tóm tắt Java 19**
-
-JEPTính năngTrạng tháiMô tả**405**Record PatternsPreviewGiải nén dữ liệu trực tiếp trong record**427**Pattern Matching for SwitchPreviewSwitch hỗ trợ pattern nâng cao**425**Virtual ThreadsPreviewThread nhẹ, hỗ trợ xử lý hàng triệu task đồng thời**428**Structured ConcurrencyIncubatorAPI quản lý nhóm task song song**424**Foreign Function & Memory APIPreviewGọi native code + quản lý bộ nhớ an toàn**426**Vector APIIncubatorTăng tốc tính toán SIMD

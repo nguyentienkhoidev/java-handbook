@@ -4,7 +4,7 @@
 
 `ArrayDeque` là một lớp trong Java thuộc gói `java.util`. Nó cung cấp một **hàng đợi hai đầu (double-ended queue)** dựa trên một mảng động. Điều này có nghĩa là bạn có thể thêm và xóa phần tử từ cả hai đầu (đầu và đuôi) của hàng đợi một cách hiệu quả.
 
-![](https://cdn.tayjava.com/production/image/20250909_115403_pasted-1757393643444.png)
+![](../images/20250909_115403_pasted-1757393643444.png)
 
 ## **2\. Các đặc điểm chính của** `ArrayDeque`
 
@@ -137,3 +137,4 @@ Vì `ArrayDeque` lưu trên mảng liên tục, cache-friendly hơn so với dan
 #### So sánh nhanh
 
 Tính năng`ArrayDequeLinkedListArrayList`Truy cập theo chỉ số❌O(n)✅ O(1)Thêm/xóa đầu/cuối✅ O(1)✅ O(1)❌ O(n)Bộ nhớÍt tốnTốn (prev/next)Trung bìnhQueue/Stack✅ Rất tốt✅ Được⚠️ Không tối ưu
+

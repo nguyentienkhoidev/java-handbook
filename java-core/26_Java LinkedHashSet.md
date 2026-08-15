@@ -4,7 +4,7 @@
 
 **LinkedHashSet** trong Java là một cấu trúc dữ liệu thuộc thư viện Java Collections Framework, được sử dụng để lưu trữ các phần tử không trùng lặp theo thứ tự thêm vào. Nó kết hợp các đặc điểm của **HashSet** và **LinkedList**:
 
-![](https://cdn.tayjava.com/production/image/20250909_113448_pasted-1757392488563.png)
+![](../images/20250909_113448_pasted-1757392488563.png)
 
 *   **Không cho phép các phần tử trùng lặp**: Giống như HashSet, LinkedHashSet không cho phép phần tử trùng lặp.
     
@@ -97,3 +97,5 @@ public class App {
     *   Tốn bộ nhớ hơn so với **HashSet** vì phải duy trì danh sách liên kết kép để lưu thứ tự chèn.
         
     *   Không có sắp xếp tự động các phần tử như **TreeSet**.
+        
+

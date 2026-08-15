@@ -1,129 +1,195 @@
-# Các Đặc Điểm Nổi Bật Của Java
+# Các Đặc Điểm Nổi Bật Của Java 18
 
-**Java 20** (phát hành tháng 3/2023). Đây cũng là bản phát hành **non-LTS**, tập trung cải tiến các tính năng **Preview/Incubator** đã giới thiệu ở Java 19, đặc biệt là nhóm **Project Loom** (Virtual Threads, Structured Concurrency) và **Pattern Matching**.
+**Java 18** (phát hành tháng 3/2022) **không phải bản LTS** (Long-Term Support) như Java 17, nhưng nó mang đến nhiều tính năng thử nghiệm (preview/incubator) và cải tiến đáng chú ý.
 
-### **1\. Record Patterns (Second Preview – JEP 432)**
+Dưới đây là các đặc điểm nổi bật:
 
-Tiếp nối JEP 405 (Java 19). Cho phép **kết hợp record pattern với pattern khác** trong cùng biểu thức, tăng tính biểu đạt.
+### **1\. UTF-8 là Charset Mặc Định (JEP 400)**
+
+*   Trước Java 18: charset mặc định phụ thuộc hệ điều hành (Windows: `Cp1252`, Linux/macOS: `UTF-8`).
+    
+*   Từ Java 18: **UTF-8 mặc định trên mọi nền tảng**.
+    
+
+📌 **Lợi ích:**
+
+*   Viết code xử lý chuỗi nhất quán trên mọi hệ điều hành.
+    
+*   Giảm lỗi khi đọc/ghi file text chứa ký tự đặc biệt.
+    
 
 📌 **Ví dụ:**
 
 ```java
-record Point(int x, int y) {}
+import java.nio.file.*;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
-static void printShape(Object obj) {
-    if (obj instanceof Point(int x, int y) && x == y) {
-        System.out.println("Hình vuông cạnh: " + x);
+public class Utf8Example {
+    public static void main(String[] args) throws IOException {
+        Path path = Paths.get("hello.txt");
+        Files.writeString(path, "Xin chào Fox Dev!");
+        String content = Files.readString(path);
+        System.out.println(content);
     }
 }
 ```
 
-👉 Giúp code dễ đọc hơn khi làm việc với record phức tạp.
+👉 Java 18 mặc định sử dụng UTF-8, không cần khai báo thủ công.
 
-### **2\. Pattern Matching for Switch (Fourth Preview – JEP 433)**
+### **2\. Simple Web Server (JEP 408)**
 
-Bổ sung thêm rule an toàn & ngữ nghĩa mới. → Giúp `switch` xử lý tốt hơn với `null`, sealed class, và guard patterns (`when`).
+*   Cung cấp **HTTP file server nhẹ** tích hợp sẵn trong JDK.
+    
+*   Phục vụ tĩnh (static files), hữu ích cho học tập, thử nghiệm REST API hoặc SPA.
+    
 
-📌 **Ví dụ:**
+📌 **Cách chạy:**
+
+```java
+jwebserver
+```
+
+Mặc định: cổng `8000`, root là thư mục hiện tại.
+
+Có thể tùy chỉnh:
+
+```java
+jwebserver -p 9000 -d /home/user/site
+```
+
+📌 **Ví dụ truy cập:**
+
+```html
+http://localhost:8000/index.html
+```
+
+👉 Thay vì cài Apache/Nginx, ta có server tích hợp trong JDK.
+
+### **3\. Code Snippets trong Javadoc (JEP 413)**
+
+*   Bổ sung thẻ `@snippet` trong Javadoc.
+    
+*   Hỗ trợ **highlight, đánh số dòng, chỉ ra lỗi** trong code.
+    
+
+📌 **Ví dụ Javadoc:**
+
+```java
+/**
+ * Tính tổng hai số nguyên.
+ *
+ * @snippet :
+ * int sum = 3 + 4;
+ * System.out.println(sum); // 7
+ */
+public class Calculator {
+    public int add(int a, int b) {
+        return a + b;
+    }
+}
+```
+
+👉 Javadoc trở nên trực quan và chuyên nghiệp hơn.
+
+### **4\. Pattern Matching cho Switch (Second Preview – JEP 420)**
+
+Mở rộng `switch` để dùng **pattern matching** thay vì `instanceof` + ép kiểu thủ công.
+
+📌 **Ví dụ trước Java 18:**
+
+```java
+if (obj instanceof String) {
+    String s = (String) obj;
+    System.out.println("Length: " + s.length());
+}
+```
+
+📌 **Với Java 18 (switch + pattern matching):**
 
 ```java
 static String format(Object obj) {
     return switch (obj) {
-        case String s when s.length() > 5 -> "Chuỗi dài";
-        case String s -> "Chuỗi ngắn";
-        case null -> "Null value";
-        default -> "Khác";
+        case Integer i -> "Số nguyên: " + i;
+        case String s  -> "Chuỗi: " + s.toUpperCase();
+        case null      -> "null";
+        default        -> "Khác";
     };
 }
 ```
 
-👉 Viết code điều kiện gọn hơn, tránh nhiều `if-else`.
+👉 Code ngắn gọn, an toàn hơn.
 
-### **3\. Virtual Threads (Second Preview – JEP 436)**
+### **5\. Vector API (Third Incubator – JEP 417)**
 
-Nâng cấp Virtual Threads từ Java 19 → Ổn định API, chuẩn bị hướng tới **tính năng chính thức trong bản LTS**.
+*   API cho phép **tận dụng SIMD (Single Instruction Multiple Data)**.
+    
+*   Xử lý mảng số học nhanh hơn nhiều so với vòng lặp for truyền thống.
+    
 
 📌 **Ví dụ:**
 
 ```java
-public class VirtualThreadDemo {
-    public static void main(String[] args) throws InterruptedException {
-        Thread t = Thread.startVirtualThread(() ->
-            System.out.println("Hello từ Virtual Thread!")
-        );
-        t.join();
+import jdk.incubator.vector.*;
+
+public class VectorExample {
+    public static void main(String[] args) {
+        var species = IntVector.SPECIES_PREFERRED;
+        int[] a = {1,2,3,4};
+        int[] b = {5,6,7,8};
+        int[] c = new int[4];
+
+        var va = IntVector.fromArray(species, a, 0);
+        var vb = IntVector.fromArray(species, b, 0);
+        var vc = va.add(vb);
+        vc.intoArray(c, 0);
+
+        System.out.println(java.util.Arrays.toString(c)); // [6, 8, 10, 12]
     }
 }
 ```
 
-👉 Giúp chạy **hàng triệu kết nối song song** mà không cần hàng triệu OS threads.
+👉 Dùng trong AI/ML, game, xử lý ảnh, big data.
 
-## 4\. **Structured Concurrency (Second Incubator – JEP 437)**
+## 6\. **Foreign Function & Memory API (Second Incubator – JEP 419)**
 
-Tiếp tục cải tiến JEP 428 (Java 19) → Cho phép gom nhóm task song song, dễ cancel, dễ propagate lỗi.
-
-📌 **Ví dụ:**
-
-```java
-import jdk.incubator.concurrent.*;
-
-try (var scope = new StructuredTaskScope.ShutdownOnFailure()) {
-    Future<String> user  = scope.fork(() -> getUser());
-    Future<Integer> order = scope.fork(() -> getOrders());
-
-    scope.join();           // chờ tất cả task hoàn thành
-    scope.throwIfFailed();  // ném exception nếu có lỗi
-
-    System.out.println(user.result() + " có " + order.result() + " đơn hàng.");
-}
-```
-
-👉 Giúp **quản lý concurrency dễ như lập trình tuần tự**.
-
-### **5\. Scoped Values (Incubator – JEP 429)**
-
-Cung cấp cách **chia sẻ dữ liệu bất biến** giữa các thread, đặc biệt hữu ích cho Virtual Threads → Là giải pháp thay thế `ThreadLocal`, nhưng **nhanh hơn, an toàn hơn**.
+*   Thay thế JNI (Java Native Interface).
+    
+*   Cho phép:
+    
+*   Gọi hàm native (C/C++).
+    
+*   Truy cập bộ nhớ ngoài Java heap an toàn.
+    
 
 📌 **Ví dụ:**
 
 ```java
-import jdk.incubator.concurrent.ScopedValue;
+import jdk.incubator.foreign.*;
 
-public class ScopedValueDemo {
-    static final ScopedValue<String> USER = ScopedValue.newInstance();
-
+public class ForeignExample {
     public static void main(String[] args) {
-        ScopedValue.where(USER, "Tây Java").run(() -> {
-            System.out.println("Xin chào " + USER.get());
-        });
-    }
-}
-```
-
-👉 Giúp quản lý dữ liệu gắn liền với luồng trong môi trường nhiều virtual threads.
-
-### **6\. Foreign Function & Memory API (Second Preview – JEP 434)**
-
-Tiếp tục cải tiến từ Java 19 (JEP 424) → Hỗ trợ tốt hơn cho việc gọi native code (C/C++) và quản lý memory ngoài heap.
-
-📌 **Ví dụ:**
-
-```java
-import java.lang.foreign.*;
-
-public class FFMExample {
-    public static void main(String[] args) {
-        try (Arena arena = Arena.ofConfined()) {
-            MemorySegment seg = arena.allocate(50);
-            seg.setUtf8String(0, "Java 20 FFM API");
-            System.out.println(seg.getUtf8String(0));
+        try (var arena = Arena.ofConfined()) {
+            MemorySegment segment = arena.allocate(64);
+            segment.setUtf8String(0, "Hello từ Java 18!");
+            System.out.println(segment.getUtf8String(0));
         }
     }
 }
 ```
 
-👉 Quan trọng cho **AI/ML, hệ thống hiệu năng cao**.
+👉 Hữu ích trong lập trình hệ thống, high-performance computing.
 
-### **✅ Tóm tắt Java 20**
+### **7\. Deprecations & Removals**
 
-JEPTính năngTrạng tháiMô tả**432**Record PatternsPreviewGiải nén record, kết hợp pattern**433**Pattern Matching for SwitchPreviewSwitch hỗ trợ guard pattern, null**436**Virtual ThreadsPreviewThread nhẹ, scale hàng triệu kết nối**437**Structured ConcurrencyIncubatorGom nhóm task song song, quản lý dễ hơn**429**Scoped ValuesIncubatorChia sẻ dữ liệu bất biến giữa threads**434**Foreign Function & Memory APIPreviewGọi native code, quản lý bộ nhớ an toàn
+*   Một số API cũ bị loại bỏ/dừng hỗ trợ:
+    
+*   `SecurityManager` (đang deprecated, chuẩn bị loại bỏ).
+    
+*   Một số cờ JVM cũ bị bỏ.
+    
+
+## ✅ Tóm tắt Java 18
+
+JEPTính năngMô tả**400**UTF-8 Default CharsetĐảm bảo encoding nhất quán trên mọi OS**408**Simple Web ServerServer HTTP nhẹ tích hợp sẵn**413**Javadoc SnippetsTài liệu có code minh họa trực quan**420**Switch Pattern MatchingSwitch hỗ trợ pattern, ngắn gọn hơn**417**Vector API (Incubator)Xử lý SIMD hiệu năng cao**419**Foreign Function & Memory API (Incubator)Gọi C/C++ an toàn, quản lý memory ngoài heap
+

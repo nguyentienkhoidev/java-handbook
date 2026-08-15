@@ -4,7 +4,7 @@
 
 HashSet là một cấu trúc dữ liệu thuộc thư viện Java Collections Framework được sử dụng để lưu trữ các phần tử duy nhất, không trùng lặp và không duy trì thứ tự. **HashSet** được triển khai dựa trên HashMap sử dụng bảng băm (hash table) để lưu trữ các phần tử, cho nên các phần tử trong **HashSet** không được sắp xếp theo thứ tự nhất định.
 
-![](https://cdn.tayjava.com/production/image/20250909_112737_pasted-1757392055840.png)
+![](../images/20250909_112737_pasted-1757392055840.png)
 
 ###   
 **2\. Đặc điểm của HashSet**
@@ -102,3 +102,5 @@ HashSet: \[Mít, Quýt, Cam, Dừa\] HashSet có chứa 'Quýt' không? true Has
     *   Không duy trì thứ tự của các phần tử.
         
     *   Không thích hợp khi cần thao tác với các phần tử theo thứ tự (chèn hoặc sắp xếp).
+        
+

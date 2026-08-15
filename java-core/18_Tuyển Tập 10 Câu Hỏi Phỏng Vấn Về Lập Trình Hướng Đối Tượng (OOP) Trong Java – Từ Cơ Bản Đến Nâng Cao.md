@@ -1,6 +1,6 @@
 # Tuyển Tập 10 Câu Hỏi Phỏng Vấn Về Lập Trình Hướng Đối Tượng (OOP) Trong Java – Từ Cơ Bản Đến Nâng Cao
 
-![OOP interview.jpeg](https://cdn.tayjava.com/production/image/2026/07/17/e4b456b2-21e3-4a33-9681-26c0c70024c5.jpeg)
+![OOP interview.jpeg](../images/e4b456b2-21e3-4a33-9681-26c0c70024c5.jpeg)
 
 Lập trình Hướng Đối Tượng (OOP) là nền tảng quan trọng trong Java. Dưới đây là 10 câu hỏi thường gặp, được sắp xếp từ mức độ dễ đến khó, kèm theo phần giải thích chi tiết.
 
@@ -215,4 +215,5 @@ class Child extends Parent {
     *   _Đây là cách Java thực hiện_ **_runtime polymorphism_**_._
         
 
-#### **_👉 Đăng ký ngay khoá học_** [**_Java Core Nâng Cao Thực Chiến - Full Version_**](https://vi.tayjava.com/courses/java-core-nang-cao-thuc-chien-full-version) **_để nắm vững Java Core và bứt phá sự nghiệp Lập Trình Java_**
+#### **_👉 Đăng ký ngay khoá học_** [**_Java Core Nâng Cao Thực Chiến - Full Version_**](https://vi.nguyentienkhoi.hashnode.dev/courses/java-core-nang-cao-thuc-chien-full-version) **_để nắm vững Java Core và bứt phá sự nghiệp Lập Trình Java_**
+

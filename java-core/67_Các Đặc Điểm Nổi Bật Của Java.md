@@ -1,76 +1,182 @@
-# Các Đặc Điểm Nổi Bật Của Java
+# Các Đặc Điểm Nổi Bật Của Java 11
 
-**Java 13** (phát hành tháng 9/2019) là bản **non-LTS**, tiếp tục cải tiến ngôn ngữ và JVM, chủ yếu mở rộng các tính năng thử nghiệm từ Java 12. 
+**Java 11** (phát hành tháng 9/2018) là một phiên bản **LTS (Long-Term Support)**, được nhiều doanh nghiệp sử dụng vì được hỗ trợ lâu dài. Đây là bản kế nhiệm quan trọng sau Java 8 (LTS) và mang lại nhiều cải tiến lớn.
 
-Dưới đây là các **đặc điểm nổi bật của Java 13**:
+### **1\. Java LTS (Long-Term Support)**
 
-### **1\. JEP 354 – Switch Expressions (Preview, lần 2)**
-
-*   Hoàn thiện hơn so với Java 12.
+*   Java 11 là bản **LTS đầu tiên sau Java 8**, được hỗ trợ dài hạn (Oracle hỗ trợ đến 2026 cho bản thương mại).
     
-*   Giới thiệu từ khóa `yield` thay cho `break` khi muốn trả về giá trị.
+*   Doanh nghiệp ưu tiên dùng Java 11 vì sự ổn định và bảo mật.
     
 
-```java
-public class App {
-    public static void main(String[] args) {
-        int dayNumber = 3;
-        String day = switch (dayNumber) {
-            case 1 -> "Monday";
-            case 2 -> "Tuesday";
-            case 3 -> {
-                yield "Wednesday";  // dùng yield
-            }
-            default -> "Unknown";
-        };
-        System.out.println(day);
-    }
-}
-```
+### **2\.** `var` **trong Lambda Parameters**
 
-→ Gọn gàng, an toàn, tránh lỗi quên `break`.
-
-### **2\. JEP 355 – Text Blocks (Preview)**
-
-*   Thêm cú pháp **text block (**`"""`**)** để viết chuỗi nhiều dòng dễ đọc hơn.
+*   Java 10 cho phép dùng `var` cho biến cục bộ.
     
-*   Giúp viết **JSON, SQL, HTML** trực tiếp trong code Java mà không cần escape.
+*   Java 11 mở rộng, cho phép dùng `var` trong **lambda parameters**.
     
 
 ```java
-String html = """
-              <html>
-                  <body>
-                      <h1>Hello Java 13</h1>
-                  </body>
-              </html>
-              """;
-System.out.println(html);
+BiFunction<Integer, Integer, Integer> add = (var x, var y) -> x + y;
+System.out.println(add.apply(10, 5)); // 15
 ```
 
-→ Loại bỏ việc phải nối chuỗi `" + "` hoặc thêm `\n`.
+### **3\. Chuỗi (String API) Mới**
 
-### **3\. JEP 350 – Dynamic CDS Archives**
+Java 11 bổ sung nhiều phương thức tiện lợi cho `String`:
 
-*   Cho phép **tạo CDS archive động** khi tắt JVM mà không cần chạy thêm lệnh riêng.
-    
-*   Giúp cải thiện **startup time** của ứng dụng Java.
+*    `isBlank()`
     
 
-### **4\. JEP 351 – ZGC: Uncommit Unused Memory**
+Kiểm tra xem chuỗi có rỗng hoặc chỉ chứa ký tự trắng (whitespace) không. Khác với `isEmpty()`, vốn chỉ kiểm tra độ dài.
 
-*   Z Garbage Collector (ZGC) có thể **trả lại bộ nhớ không dùng cho hệ điều hành**.
-    
-*   Giúp ứng dụng có workload biến động tiết kiệm RAM.
-    
+```java
+System.out.println("".isBlank());        // true
+System.out.println("   ".isBlank());     // true
+System.out.println("abc".isBlank());     // false
+```
 
-### **5\. JEP 353 – Reimplement the Legacy Socket API**
-
-*   Thư viện `java.net.Socket` và `ServerSocket` được **viết lại** bằng code hiện đại, dễ bảo trì hơn.
-    
-*   Không thay đổi API, nhưng tăng hiệu năng và khả năng mở rộng.
+*   `lines()`
     
 
-### **📌 Tóm Tắt Java 13**
+Trả về một `Stream<String>` gồm các dòng trong chuỗi, tách bởi ký tự xuống dòng. → Hữu ích khi xử lý văn bản nhiều dòng.
 
-#Tính năngMô tả ngắn1Switch Expressions (Preview 2)Hoàn thiện cú pháp `switch` với `yield`2Text Blocks (Preview)Chuỗi nhiều dòng với `"""`3Dynamic CDS ArchivesTự động tạo CDS archive khi JVM tắt4ZGC Uncommit MemoryTrả RAM không dùng cho OS5Legacy Socket API RewriteViết lại thư viện Socket tăng hiệu năng
+```java
+String text = "Java\nPython\nC++";
+text.lines().forEach(System.out::println);
+```
+
+– Kết quả:
+
+```java
+Java
+Python
+C++
+```
+
+*   `strip()`**,** `stripLeading()`**,** `stripTrailing()`
+    
+
+Loại bỏ ký tự trắng (bao gồm cả Unicode whitespace) ở đầu/cuối chuỗi. Khác với `trim()`, vốn chỉ xử lý một số whitespace trong bảng ASCII.
+
+```java
+System.out.println("  Fox Dev  ".strip());        // "Fox Dev"
+System.out.println("  Fox Dev  ".stripLeading()); // "Fox Dev  "
+System.out.println("  Fox Dev  ".stripTrailing());// "  Fox Dev"
+```
+
+*   `repeat(int count)`
+    
+
+Lặp lại chuỗi nhiều lần.
+
+```java
+System.out.println("Java ".repeat(3)); // Java Java Java 
+```
+
+*   `indent(int n)`
+    
+
+Thêm/thụt lề vào từng dòng trong chuỗi. (Thực tế chính thức từ Java 12, nhưng nhiều tài liệu nhắc chung khi học String API mới).
+
+```java
+System.out.println("Hello\nWorld".indent(4));
+```
+
+### **4\. HTTP Client API (Chuẩn hóa từ Java 9/10)**
+
+*   API HTTP/2 Client chính thức được chuẩn hóa (không còn ở chế độ incubator).
+    
+*   Hỗ trợ **HTTP/2** và **WebSocket**.
+    
+
+```java
+HttpClient client = HttpClient.newHttpClient();
+HttpRequest request = HttpRequest.newBuilder()
+        .uri(URI.create("https://nguyentienkhoi.hashnode.dev"))
+        .build();
+HttpResponse<String> response =
+        client.send(request, HttpResponse.BodyHandlers.ofString());
+
+System.out.println(response.body());
+```
+
+### **5\. API Files:** `readString()` **và** `writeString()`
+
+Đọc/ghi file đơn giản hơn với `Files.readString()` và `Files.writeString()`.
+
+```java
+Path path = Path.of("test.txt");
+
+// Ghi chuỗi vào file
+Files.writeString(path, "Hello Java 11");
+
+// Đọc chuỗi từ file
+String content = Files.readString(path);
+System.out.println(content);
+```
+
+### **6\. Collection API**
+
+Bổ sung phương thức `toArray(IntFunction<T[]>)` giúp chuyển `Collection` sang mảng tiện lợi.
+
+```java
+List<String> list = List.of("Java", "Python", "C++");
+String[] array = list.toArray(String[]::new);
+System.out.println(Arrays.toString(array));
+```
+
+### **7\. Optional API**
+
+Thêm các phương thức mới cho `Optional`:
+
+```java
+Optional<String> opt = Optional.of("Java 11");
+
+System.out.println(opt.isEmpty());         // false
+opt.ifPresentOrElse(
+    v -> System.out.println("Value: " + v),
+    () -> System.out.println("No value")
+);
+```
+
+### **8\. Nashorn JavaScript Engine Removed**
+
+*   **Nashorn**, engine JavaScript tích hợp từ Java 8, đã bị **loại bỏ** vì ít được sử dụng và đã lỗi thời.
+    
+
+### **9\. JEP 333 – Flight Recorder**
+
+*   Công cụ giám sát hiệu năng và phân tích lỗi (giống như “black box” cho JVM).
+    
+*   Giúp dễ dàng theo dõi hiệu suất trong môi trường production.
+    
+
+### **10\. JEP 318 – Epsilon GC (Garbage Collector “No-Op”)**
+
+*   Một **GC tối giản** chỉ phân bổ bộ nhớ mà không thu gom rác.
+    
+*   Dùng cho benchmark/test, không dùng trong production.
+    
+
+### **11\. JEP 335 – Deprecate Nashorn**
+
+Chính thức deprecated `Nashorn` APIs (JS engine).
+
+### **12\. Miscellaneous Changes**
+
+**Single-File Source Code Execution**: Chạy file `.java` trực tiếp mà không cần biên dịch thủ công.
+
+```java
+$ java Hello.java
+```
+
+*   **Standardized Launching of Nested JARs** (hữu ích cho Spring Boot).
+    
+*   Nhiều cải tiến về bảo mật & hiệu năng JVM.
+    
+
+### **📌 Tóm Tắt Java 11**
+
+#Tính năngMô tả ngắn1LTSBản Long-Term Support, ổn định cho doanh nghiệp2`var` trong lambdaHỗ trợ `var` cho tham số lambda3String APIThêm `isBlank()`, `lines()`, `repeat()`, `strip()`4HTTP ClientHTTP/2 Client chính thức5Files API`readString()`, `writeString()` đơn giản hơn6Collection API`toArray()` cải tiến7Optional APIThêm `isEmpty()`, `ifPresentOrElse()`8Nashorn RemovedLoại bỏ Nashorn JavaScript Engine9Flight RecorderCông cụ giám sát JVM10Epsilon GCGC không thu gom rác (benchmark)11Single-file ExecutionChạy trực tiếp file `.java`12KhácCải thiện hiệu năng, bảo mật JVM
+

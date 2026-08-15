@@ -1,181 +1,206 @@
-# Các Đặc Điểm Nổi Bật Của Java
+# Các Đặc Điểm Nổi Bật Của Java 9
 
-**Java 11** (phát hành tháng 9/2018) là một phiên bản **LTS (Long-Term Support)**, được nhiều doanh nghiệp sử dụng vì được hỗ trợ lâu dài. Đây là bản kế nhiệm quan trọng sau Java 8 (LTS) và mang lại nhiều cải tiến lớn.
+Java 9 phát hành vào tháng 9 năm 2017 đã mang đến nhiều tính năng và cải tiến mạnh mẽ, đặc biệt trong việc tổ chức mã nguồn và tối ưu hóa hiệu suất hệ thống.
 
-### **1\. Java LTS (Long-Term Support)**
+Dưới đây là **những đặc điểm nổi bật của Java 9:**
 
-*   Java 11 là bản **LTS đầu tiên sau Java 8**, được hỗ trợ dài hạn (Oracle hỗ trợ đến 2026 cho bản thương mại).
+### **1\. Java Platform Module System (JPMS) – Project Jigsaw**
+
+Tính năng quan trọng nhất của Java 9, cung cấp **hệ thống module** giúp chia ứng dụng thành các module nhỏ, dễ quản lý hơn.
+
+*   Cải thiện khả năng bảo trì.
     
-*   Doanh nghiệp ưu tiên dùng Java 11 vì sự ổn định và bảo mật.
+*   Tối ưu kích thước ứng dụng.
+    
+*   Giảm thời gian khởi động.
     
 
-### **2\.** `var` **trong Lambda Parameters**
+**Khái niệm:**
 
-*   Java 10 cho phép dùng `var` cho biến cục bộ.
+*   **Module**: Tập hợp các package và tài nguyên liên quan.
     
-*   Java 11 mở rộng, cho phép dùng `var` trong **lambda parameters**.
+*   **Module Descriptor**: File `module-info.java` định nghĩa dependency và các package được export.
+    
+
+### **2\. REPL – JShell**
+
+Java 9 giới thiệu **JShell** – một công cụ REPL (**Read-Eval-Print-Loop**) cho phép chạy lệnh Java trực tiếp, không cần tạo file hay class.  
+👉 Hữu ích cho việc học, thử nghiệm code nhỏ, test nhanh tính năng.
+
+– Ví dụ:
+
+```java
+jshell> System.out.println("Hello, JShell!");
+```
+
+### **3\. Factory Methods cho Collections**
+
+Java 9 bổ sung các phương thức factory như `List.of()`, `Set.of()`, `Map.of()` để tạo **collection bất biến (immutable)** nhanh gọn.
+
+– Ví dụ:
+
+```java
+public class App {
+    public static void main(String[] args) {
+        List<String> list = List.of("Java", "PHP", "Python");
+        list.forEach(System.out::println);
+
+        Map<Integer, String> map = Map.of(1, "Vietnam", 2, "Lao", 3, "Cambodia");
+        map.forEach((k, v) -> System.out.println(k + "=" + v));
+
+        Set<String> set = Set.of("Java", "Spring", "Hibernate", "JSP");
+        set.forEach(System.out::println);
+    }
+}
+```
+
+### **4\. Anonymous Inner Class**
+
+Dùng để **triển khai nhanh một interface hoặc abstract class** mà không cần tạo class riêng.
+
+– Ví dụ:
+
+```java
+public abstract class AnonymousInnerClasses<T> {
+    abstract T calculate(int a, int b);
+}
+```
+
+```java
+public class App {
+    public static void main(String[] args) {
+        AnonymousInnerClasses<Integer> add = new AnonymousInnerClasses<>() {
+            @Override
+            Integer calculate(int x, int y) { return x + y; }
+        };
+        System.out.println("a + b = " + add.calculate(10, 3));
+
+        AnonymousInnerClasses<Long> sub = new AnonymousInnerClasses<>() {
+            @Override
+            Long calculate(int x, int y) { return (long) x - y; }
+        };
+        System.out.println("a - b = " + sub.calculate(15, 5));
+    }
+}
+```
+
+### **5\. Java Runtime Version API**
+
+Java 9 giới thiệu `Runtime.Version` giúp truy vấn thông tin phiên bản chính xác hơn.
+
+```java
+public class JavaRuntimeVersion {
+    public static void main(String[] args) {
+        Runtime.Version version = Runtime.version();
+        System.out.println("Version: " + version.version());
+        System.out.println("Build: " + version.build());
+        System.out.println("Major: " + version.major());
+        System.out.println("Minor: " + version.minor());
+        System.out.println("Patch: " + version.patch());
+        System.out.println("Security: " + version.security());
+    }
+}
+```
+
+### **6\. Cải Tiến Stream API**
+
+Các phương thức mới:
+
+*   `takeWhile()` → Lấy phần tử đến khi điều kiện sai.
+    
+*   `dropWhile()` → Bỏ phần tử đến khi điều kiện sai.
+    
+*   `ofNullable()` → Tạo stream có thể chứa null.
+    
+*   `iterate()` → Hỗ trợ điều kiện dừng.
+    
+
+– Ví dụ `iterate()`:
+
+```java
+Stream<Integer> stream = Stream.iterate(2, i -> i <= 100, i -> i * 2);
+stream.forEach(System.out::println);
+```
+
+### **7\. Private Methods trong Interface**
+
+Java 9 cho phép định nghĩa **private methods** trong interface để tái sử dụng code giữa `default` và `static methods`.
+
+```java
+public interface PrivateInterfaceMethods {
+    default void sayHello() {
+        speak();
+    }
+    private void speak() {
+        System.out.println("Welcome to Java 9");
+    }
+    private static void goodbye() {
+        System.out.println("Good bye!");
+    }
+    void printMessage();
+}
+```
+
+### **8\. HTTP/2 Client API**
+
+Java 9 giới thiệu **HTTP/2 Client API** thay thế `HttpURLConnection`, hỗ trợ **HTTP/2** và **WebSocket**.
+
+```java
+public class App {
+    public static void main(String[] args) throws Exception {
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("https://nguyentienkhoi.hashnode.dev"))
+                .build();
+
+        HttpResponse<String> response = client.send(request,
+                HttpResponse.BodyHandlers.ofString());
+        System.out.println(response.body());
+    }
+}
+```
+
+### **9\. Multi-Release JAR Files**
+
+Một JAR có thể chứa **nhiều phiên bản class** cho các phiên bản Java khác nhau, giúp duy trì **tương thích ngược** mà không cần tạo nhiều file JAR riêng.
+
+### **10\. Enhanced Process API**
+
+Quản lý và giám sát process dễ dàng hơn.
+
+```java
+public class App {
+    public static void main(String[] args) {
+        ProcessHandle handle = ProcessHandle.current();
+        System.out.println("PID: " + handle.pid());
+        System.out.println("Info: " + handle.info());
+        System.out.println("Alive: " + handle.isAlive());
+    }
+}
+```
+
+### **11\. Improved Deprecation**
+
+Annotation `@Deprecated` nay có thêm:
+
+*   `since` → Bắt đầu deprecated từ phiên bản nào.
+    
+*   `forRemoval` → Có định xóa trong tương lai không.
     
 
 ```java
-BiFunction<Integer, Integer, Integer> add = (var x, var y) -> x + y;
-System.out.println(add.apply(10, 5)); // 15
+@Deprecated(since = "9", forRemoval = true)
+public void deprecatedMethodName() {
+    // logic
+}
 ```
 
-### **3\. Chuỗi (String API) Mới**
+### **12\. Miscellaneous Changes (Khác)**
 
-Java 11 bổ sung nhiều phương thức tiện lợi cho `String`:
-
-*    `isBlank()`
+*   **Unified JVM Logging**: Hợp nhất logging API của JVM.
+    
+*   **Compact Strings**: Dùng `byte[]` để tiết kiệm bộ nhớ cho chuỗi Latin-1.
+    
+*   **Variable Handles**: API mạnh mẽ hơn `Atomic` để thao tác biến.
     
 
-Kiểm tra xem chuỗi có rỗng hoặc chỉ chứa ký tự trắng (whitespace) không. Khác với `isEmpty()`, vốn chỉ kiểm tra độ dài.
-
-```java
-System.out.println("".isBlank());        // true
-System.out.println("   ".isBlank());     // true
-System.out.println("abc".isBlank());     // false
-```
-
-*   `lines()`
-    
-
-Trả về một `Stream<String>` gồm các dòng trong chuỗi, tách bởi ký tự xuống dòng. → Hữu ích khi xử lý văn bản nhiều dòng.
-
-```java
-String text = "Java\nPython\nC++";
-text.lines().forEach(System.out::println);
-```
-
-– Kết quả:
-
-```java
-Java
-Python
-C++
-```
-
-*   `strip()`**,** `stripLeading()`**,** `stripTrailing()`
-    
-
-Loại bỏ ký tự trắng (bao gồm cả Unicode whitespace) ở đầu/cuối chuỗi. Khác với `trim()`, vốn chỉ xử lý một số whitespace trong bảng ASCII.
-
-```java
-System.out.println("  Tây Java  ".strip());        // "Tây Java"
-System.out.println("  Tây Java  ".stripLeading()); // "Tây Java  "
-System.out.println("  Tây Java  ".stripTrailing());// "  Tây Java"
-```
-
-*   `repeat(int count)`
-    
-
-Lặp lại chuỗi nhiều lần.
-
-```java
-System.out.println("Java ".repeat(3)); // Java Java Java 
-```
-
-*   `indent(int n)`
-    
-
-Thêm/thụt lề vào từng dòng trong chuỗi. (Thực tế chính thức từ Java 12, nhưng nhiều tài liệu nhắc chung khi học String API mới).
-
-```java
-System.out.println("Hello\nWorld".indent(4));
-```
-
-### **4\. HTTP Client API (Chuẩn hóa từ Java 9/10)**
-
-*   API HTTP/2 Client chính thức được chuẩn hóa (không còn ở chế độ incubator).
-    
-*   Hỗ trợ **HTTP/2** và **WebSocket**.
-    
-
-```java
-HttpClient client = HttpClient.newHttpClient();
-HttpRequest request = HttpRequest.newBuilder()
-        .uri(URI.create("https://tayjava.com"))
-        .build();
-HttpResponse<String> response =
-        client.send(request, HttpResponse.BodyHandlers.ofString());
-
-System.out.println(response.body());
-```
-
-### **5\. API Files:** `readString()` **và** `writeString()`
-
-Đọc/ghi file đơn giản hơn với `Files.readString()` và `Files.writeString()`.
-
-```java
-Path path = Path.of("test.txt");
-
-// Ghi chuỗi vào file
-Files.writeString(path, "Hello Java 11");
-
-// Đọc chuỗi từ file
-String content = Files.readString(path);
-System.out.println(content);
-```
-
-### **6\. Collection API**
-
-Bổ sung phương thức `toArray(IntFunction<T[]>)` giúp chuyển `Collection` sang mảng tiện lợi.
-
-```java
-List<String> list = List.of("Java", "Python", "C++");
-String[] array = list.toArray(String[]::new);
-System.out.println(Arrays.toString(array));
-```
-
-### **7\. Optional API**
-
-Thêm các phương thức mới cho `Optional`:
-
-```java
-Optional<String> opt = Optional.of("Java 11");
-
-System.out.println(opt.isEmpty());         // false
-opt.ifPresentOrElse(
-    v -> System.out.println("Value: " + v),
-    () -> System.out.println("No value")
-);
-```
-
-### **8\. Nashorn JavaScript Engine Removed**
-
-*   **Nashorn**, engine JavaScript tích hợp từ Java 8, đã bị **loại bỏ** vì ít được sử dụng và đã lỗi thời.
-    
-
-### **9\. JEP 333 – Flight Recorder**
-
-*   Công cụ giám sát hiệu năng và phân tích lỗi (giống như “black box” cho JVM).
-    
-*   Giúp dễ dàng theo dõi hiệu suất trong môi trường production.
-    
-
-### **10\. JEP 318 – Epsilon GC (Garbage Collector “No-Op”)**
-
-*   Một **GC tối giản** chỉ phân bổ bộ nhớ mà không thu gom rác.
-    
-*   Dùng cho benchmark/test, không dùng trong production.
-    
-
-### **11\. JEP 335 – Deprecate Nashorn**
-
-Chính thức deprecated `Nashorn` APIs (JS engine).
-
-### **12\. Miscellaneous Changes**
-
-**Single-File Source Code Execution**: Chạy file `.java` trực tiếp mà không cần biên dịch thủ công.
-
-```java
-$ java Hello.java
-```
-
-*   **Standardized Launching of Nested JARs** (hữu ích cho Spring Boot).
-    
-*   Nhiều cải tiến về bảo mật & hiệu năng JVM.
-    
-
-### **📌 Tóm Tắt Java 11**
-
-#Tính năngMô tả ngắn1LTSBản Long-Term Support, ổn định cho doanh nghiệp2`var` trong lambdaHỗ trợ `var` cho tham số lambda3String APIThêm `isBlank()`, `lines()`, `repeat()`, `strip()`4HTTP ClientHTTP/2 Client chính thức5Files API`readString()`, `writeString()` đơn giản hơn6Collection API`toArray()` cải tiến7Optional APIThêm `isEmpty()`, `ifPresentOrElse()`8Nashorn RemovedLoại bỏ Nashorn JavaScript Engine9Flight RecorderCông cụ giám sát JVM10Epsilon GCGC không thu gom rác (benchmark)11Single-file ExecutionChạy trực tiếp file `.java`12KhácCải thiện hiệu năng, bảo mật JVM

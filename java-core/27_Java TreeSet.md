@@ -4,7 +4,7 @@
 
 **TreeSet** là một cấu trúc dữ liệu thuộc Java Collections Framework dùng để lưu trữ các phần tử theo thứ tự tự nhiên (hoặc theo một tiêu chí được chỉ định) và không cho phép các phần tử trùng lặp. TreeSet được triển khai dựa trên `NavigableSet` và sử dụng cây nhị phân cân bằng (`Red-Black Tree`) để lưu trữ và sắp xếp các phần tử.
 
-![](https://cdn.tayjava.com/production/image/20250909_114106_pasted-1757392864746.png)
+![](../images/20250909_114106_pasted-1757392864746.png)
 
 ## **2\. Đặc điểm chính của TreeSet**
 
@@ -105,3 +105,5 @@ TreeSet sau khi xóa 10: [5, 15, 20]
     *   Không cho phép phần tử null.
         
     *   TreeSet có hiệu suất kém hơn HashSet trong trường hợp không cần duy trì thứ tự vì HashSet có thời gian O(1) cho các thao tác thêm, xóa, và tìm kiếm.
+        
+

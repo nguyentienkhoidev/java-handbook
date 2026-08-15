@@ -1,169 +1,200 @@
-# Các Đặc Điểm Nổi Bật Của Java
+# Các Đặc Điểm Nổi Bật Của Java 23
 
-**Java 25** được phát hành vào tháng 9 năm 2025 là một **phiên bản LTS (Long-Term Support)**. Đây là một cột mốc quan trọng, hứa hẹn mang đến sự ổn định lâu dài cho các hệ thống doanh nghiệp, đồng thời tích hợp nhiều tính năng mới từ các phiên bản trước.
+Ngày **17/09/2024**, Oracle chính thức phát hành **Java SE 23**. Đây là bản **non-LTS** (không phải Long-Term Support), nhưng mang đến nhiều cải tiến quan trọng về **ngôn ngữ, thư viện, JVM và công cụ phát triển**.
 
-Dưới đây là những cải tiến nổi bật trong Java 25:
+### **1\. Markdown trong Javadoc (JEP 467 – Final)**
 
-### **1\. Finalization bị loại bỏ hoàn toàn**
-
-Finalization vốn gây nhiều vấn đề về hiệu năng và khó kiểm soát tài nguyên. Trong Java 25, cơ chế này đã **bị loại bỏ hẳn**, thay vào đó là các giải pháp an toàn hơn với `Cleaner` API hoặc `try-with-resources`
-
-📌 Ví dụ: Thay thế `Finalization` bằng `Cleaner` → Giúp quản lý tài nguyên rõ ràng hơn thay vì dựa vào `finalize()`.
+Từ Java 23, bạn có thể viết tài liệu bằng **Markdown** trực tiếp trong Javadoc, thay vì phải dùng HTML cứng hoặc tag phức tạp. Việc này giúp viết tài liệu dễ đọc hơn, đặc biệt với các dự án lớn.
 
 ```java
-import java.lang.ref.Cleaner;
+/**
+ * # Calculator Class
+ *
+ * Đây là ví dụ **Markdown** trong Javadoc.
+ *
+ * - Hỗ trợ tiêu đề
+ * - Hỗ trợ in đậm / in nghiêng
+ * - Hỗ trợ danh sách
+ */
+public class Calculator {
+    public int add(int a, int b) {
+        return a + b;
+    }
+}
+```
 
-class Resource {
-    private static final Cleaner cleaner = Cleaner.create();
+### **2\. Generational ZGC Mặc Định (JEP 474 – Final)**
 
-    private final Cleaner.Cleanable cleanable;
+*   **ZGC (Z Garbage Collector)** vốn nổi tiếng vì độ trễ thấp.
+    
+*   Từ Java 23, **ZGC mặc định sử dụng generational mode** → tách đối tượng thành **Young** và **Old Generation**, giúp thu gom rác hiệu quả hơn.
+    
 
-    public Resource() {
-        cleanable = cleaner.register(this, () -> {
-            System.out.println("Resource cleaned safely!");
+👉 Bạn không cần chỉnh JVM option, chỉ cần chạy ứng dụng là được hưởng lợi.
+
+### **3\. Pattern Matching hỗ trợ Primitive Types (JEP 455 – Preview)**
+
+Trước đây bạn chỉ dùng được wrapper (`Integer`, `Double`). Với Java 23 bạn có thể dùng **primitive types** (`int`, `double`, `long`) trực tiếp trong `switch` và `instanceof`.
+
+```java
+Object o = 42;
+
+String result = switch (o) {
+    case int i    -> "Số nguyên: " + i;
+    case double d -> "Số thực: " + d;
+    case String s -> "Chuỗi: " + s;
+    default       -> "Không xác định";
+};
+
+System.out.println(result); // Số nguyên: 42
+```
+
+### **4\. Flexible Constructor Bodies (JEP 482 – 2nd Preview)**
+
+Cho phép viết **câu lệnh trước** `super()` **hoặc** `this()` trong constructor. Giúp constructor dễ viết, dễ thêm logic kiểm tra/khởi tạo.
+
+```java
+public class Parent {
+    Parent(int x) {
+        System.out.println("Parent: " + x);
+    }
+}
+```
+
+```java
+public class Child extends Parent {
+    Child(int x) {
+        if (x < 0) throw new IllegalArgumentException("x không được âm");
+        super(x); // Trước đây phải luôn là dòng đầu tiên
+        System.out.println("Child: " + x);
+    }
+}
+```
+
+```java
+public class App {
+    public static void main(String[] args) {
+        new Child(10);
+    }
+}
+```
+
+### **5\. Stream Gatherers (JEP 473 – 2nd Preview)**
+
+Thêm **Gatherers API** để mở rộng Stream pipeline với các thao tác phức tạp hơn, Giúp Stream API linh hoạt hơn nhiều.
+
+📌 Ví dụ: nhóm các phần tử liên tiếp thành cặp.
+
+```java
+import java.util.stream.*;
+import java.util.stream.Gatherers;
+
+public class App {
+    public static void main(String[] args) {
+        Stream.of(1, 2, 3, 4, 5, 6)
+              .gather(Gatherers.windowFixed(2)) // Gom thành cửa sổ 2 phần tử
+              .forEach(System.out::println);
+    }
+}
+```
+
+– Kết quả:
+
+```java
+[1, 2]
+[2, 3]
+[3, 4]
+[4, 5]
+[5, 6]
+```
+
+### **6\. Structured Concurrency (JEP 480 – 3rd Preview)**
+
+Quản lý nhiều tác vụ song song theo **cấu trúc** (giống như scope), dễ kiểm soát hơn. Dễ dùng hơn `CompletableFuture`, code ngắn gọn và an toàn hơn.
+
+```java
+import java.util.concurrent.*;
+
+public class App {
+    public static void main(String[] args) throws Exception {
+        try (var scope = new StructuredTaskScope.ShutdownOnFailure()) {
+            Future<String> f1 = scope.fork(() -> "Dữ liệu API 1");
+            Future<String> f2 = scope.fork(() -> "Dữ liệu API 2");
+
+            scope.join();             // Chờ tất cả xong
+            scope.throwIfFailed();    // Ném lỗi nếu có
+
+            System.out.println(f1.resultNow() + " + " + f2.resultNow());
+        }
+    }
+}
+```
+
+### **7\. Scoped Values (JEP 481 – 3rd Preview)**
+
+Thay thế `ThreadLocal` để chia sẻ **giá trị bất biến** giữa các thread hoặc virtual thread. An toàn và dễ quản lý hơn `ThreadLocal`
+
+```java
+import jdk.incubator.concurrent.ScopedValue;
+
+public class App {
+    static final ScopedValue<String> USER = ScopedValue.newInstance();
+
+    public static void main(String[] args) {
+        ScopedValue.runWhere(USER, "Fox Dev", () -> {
+            System.out.println("Xin chào " + USER.get());
         });
     }
 }
 ```
 
+### **8\. Vector API (JEP 469 – 8th Incubator)**
+
+Giúp tận dụng **SIMD instructions** để xử lý mảng nhanh hơn, Rất hữu ích cho AI/ML, xử lý ảnh, dữ liệu lớn.
+
 ```java
+import jdk.incubator.vector.*;
+
 public class App {
-    static void main(String[] args) {
-        new Resource();
-        System.gc(); // gọi GC, sẽ kích hoạt cleaner
-    }
-}
-```
-
-### **2\. Unnamed Variables and Patterns (JEP 443)**
-
-Java 25 tiếp tục mở rộng hỗ trợ **biến ẩn danh (**`_`**)** và **pattern matching,** Điều này giúp code gọn hơn khi có biến nhưng không cần dùng đến.
-
-📌 Ví dụ:
-
-```java
-record Point(int x, int y) {}
-
-public class Main {
     public static void main(String[] args) {
-        Point p = new Point(10, 20);
-
-        if (p instanceof Point(int x, _)) { // y không cần dùng
-            System.out.println("x = " + x);
-        }
+        var v1 = IntVector.fromArray(IntVector.SPECIES_256, new int[]{1,2,3,4}, 0);
+        var v2 = IntVector.fromArray(IntVector.SPECIES_256, new int[]{5,6,7,8}, 0);
+        var result = v1.add(v2);
+        System.out.println(result); // [6, 8, 10, 12]
     }
 }
 ```
 
-→ Giúp code bớt lộn xộn, tránh cảnh báo “unused variable”.
+### **9\. Class-File API (JEP 466 – 2nd Preview)**
 
-### **3\. Foreign Function & Memory API (FFM API) chính thức**
-
-Từ Java 22–24, FFM API đã trong giai đoạn preview. Đến Java 25, nó chính thức **ổn định**, thay thế JNI.
-
-*   Gọi **hàm native (C/C++)** trực tiếp từ Java.
-    
-*   Quản lý bộ nhớ ngoài heap an toàn hơn.
-    
-
-**📌** Ví dụ: Truy cập bộ nhớ ngoài heap
+API chuẩn để đọc/ghi file `.class` mà không cần thư viện bên ngoài (ASM, BCEL). Giúp lập trình meta (code gen, phân tích bytecode) trở nên dễ dàng hơn.
 
 ```java
-import java.lang.foreign.Arena;
-import java.lang.foreign.MemorySegment;
-import java.lang.foreign.ValueLayout;
+import jdk.classfile.*;
 
 public class App {
-    static void main(String[] args) {
-        try (Arena arena = Arena.ofConfined()) {
-            MemorySegment segment = arena.allocate(100);
-            segment.set(ValueLayout.JAVA_INT, 0, 42);
-            int value = segment.get(ValueLayout.JAVA_INT, 0);
-            System.out.println("Value = " + value); // 42
-        }
+    public static void main(String[] args) {
+        ClassModel cm = ClassFile.of().parse(ClassFileExample.class);
+        cm.methods().forEach(m -> System.out.println(m.name()));
     }
 }
 ```
 
-→ Giúp Java tương tác hiệu quả với C libraries, thay thế JNI cồng kềnh.
+### **10\. Thay đổi & Deprecation**
 
-### **4\. Virtual Threads (Project Loom) tối ưu hơn**
-
-Virtual Threads ra mắt trong Java 21, đến Java 25 thì đã **ổn định hơn, cải tiến hiệu năng**.
-
-*   Tạo hàng triệu thread nhẹ.
+*   **JEP 471**: Deprecate các phương thức truy cập bộ nhớ trong `sun.misc.Unsafe`.
     
-*   Rất hữu ích cho ứng dụng server, microservices.
+*   **String Templates** (preview ở Java 21/22) đã **bị loại bỏ** khỏi Java 23.
     
 
-**📌** Ví dụ:
+#### 🎯 Kết luận
 
-```java
-public class App {
-    static void main(String[] args) throws Exception {
-        try (var executor = java.util.concurrent.Executors.newVirtualThreadPerTaskExecutor()) {
-            for (int i = 0; i < 5; i++) {
-                int taskId = i;
-                executor.submit(() -> {
-                    System.out.println("Task " + taskId + " running on " + Thread.currentThread());
-                });
-            }
-        }
-    }
-}
-```
+Java 23 mang đến nhiều cải tiến mạnh mẽ:
 
-→ Giúp server Java xử lý concurrent request giống như Go hoặc Node.js.
-
-### **5\. Pattern Matching nâng cao (Switch + Records)**
-
-Java 25 tiếp tục cải tiến pattern matching cho `switch` và `record`.
-
-**📌** Ví dụ:
-
-```java
-sealed interface Shape permits Circle, Rectangle {}
-record Circle(double radius) implements Shape {}
-record Rectangle(double w, double h) implements Shape {}
-
-public class App {
-    static void main(String[] args) {
-        Shape shape = new Rectangle(4, 5);
-
-        double area = switch (shape) {
-            case Circle c -> Math.PI * c.radius() * c.radius();
-            case Rectangle r -> r.w() * r.h();
-        };
-
-        System.out.println("Area = " + area);
-    }
-}
-```
-
-→ Cú pháp ngắn gọn, thay thế `instanceof` + ép kiểu thủ công.
-
-### **6\. Hiệu năng JVM & Garbage Collector (GC)**
-
-*   Cải thiện **ZGC** và **Shenandoah GC** cho độ trễ thấp hơn.
+*   Hoàn thiện Markdown Javadoc, Generational ZGC.
     
-*   Tối ưu **JIT Compiler** để tăng tốc độ thực thi.
+*   Preview: Pattern Matching với primitive, Stream Gatherers, Structured Concurrency, Scoped Values.
+    
+*   API mới: Class-File API, Vector API.
     
 
-👉 Điều này đặc biệt quan trọng cho ứng dụng **real-time** và **high throughput**.
-
-#### 🎯 Kết Luận
-
-Java 25 (LTS) là bản cập nhật quan trọng, đặc biệt cho **các doanh nghiệp và hệ thống lớn** nhờ:
-
-*   **Loại bỏ Finalization**, thay bằng cơ chế quản lý tài nguyên an toàn hơn.
-    
-*   **FFM API chính thức**, thay thế JNI.
-    
-*   **Virtual Threads mạnh mẽ hơn**, tối ưu xử lý concurrent.
-    
-*   **Pattern Matching nâng cao** giúp code ngắn gọn.
-    
-*   **Hiệu năng JVM & GC vượt trội**.
-    
-
-👉 Nếu bạn đang làm hệ thống lớn hoặc cần một bản Java **ổn định 8 năm**, Java 25 là lựa chọn hoàn hảo.

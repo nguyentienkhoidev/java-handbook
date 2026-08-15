@@ -1,198 +1,153 @@
-# Các Đặc Điểm Nổi Bật Của Java
+# Các Đặc Điểm Nổi Bật Của Java 21
 
-Ngày **17/09/2024**, Oracle chính thức phát hành **Java SE 23**. Đây là bản **non-LTS** (không phải Long-Term Support), nhưng mang đến nhiều cải tiến quan trọng về **ngôn ngữ, thư viện, JVM và công cụ phát triển**.
+### **1\. Giới thiệu**
 
-### **1\. Markdown trong Javadoc (JEP 467 – Final)**
+Java 21 là bản phát hành **Hỗ trợ Dài hạn (LTS – Long Term Support)** được công bố vào tháng 9 năm 2023. Phiên bản này mang đến nhiều tính năng mới và cải tiến trong các lĩnh vực **ngôn ngữ**, **thư viện** và **JVM**.
 
-Từ Java 23, bạn có thể viết tài liệu bằng **Markdown** trực tiếp trong Javadoc, thay vì phải dùng HTML cứng hoặc tag phức tạp. Việc này giúp viết tài liệu dễ đọc hơn, đặc biệt với các dự án lớn.
+Java 21 đặc biệt nổi bật với:
 
-```java
-/**
- * # Calculator Class
- *
- * Đây là ví dụ **Markdown** trong Javadoc.
- *
- * - Hỗ trợ tiêu đề
- * - Hỗ trợ in đậm / in nghiêng
- * - Hỗ trợ danh sách
- */
-public class Calculator {
-    public int add(int a, int b) {
-        return a + b;
-    }
-}
-```
-
-### **2\. Generational ZGC Mặc Định (JEP 474 – Final)**
-
-*   **ZGC (Z Garbage Collector)** vốn nổi tiếng vì độ trễ thấp.
+*   Quản lý luồng hiện đại nhờ **Virtual Threads** và **Structured Concurrency**.
     
-*   Từ Java 23, **ZGC mặc định sử dụng generational mode** → tách đối tượng thành **Young** và **Old Generation**, giúp thu gom rác hiệu quả hơn.
+*   Hỗ trợ mạnh mẽ cho **pattern matching**.
+    
+*   Cải tiến về **chuỗi (string templates)**.
+    
+*   Nâng cao hiệu suất với **Generational ZGC**.
     
 
-👉 Bạn không cần chỉnh JVM option, chỉ cần chạy ứng dụng là được hưởng lợi.
+👉 Những tính năng này giúp phát triển các ứng dụng **lớn, phức tạp** nhưng vẫn giữ được **an toàn, hiệu quả và dễ đọc**.
 
-### **3\. Pattern Matching hỗ trợ Primitive Types (JEP 455 – Preview)**
+### **2\. Pattern Matching for Switch (Final Release)**
 
-Trước đây bạn chỉ dùng được wrapper (`Integer`, `Double`). Với Java 23 bạn có thể dùng **primitive types** (`int`, `double`, `long`) trực tiếp trong `switch` và `instanceof`.
-
-```java
-Object o = 42;
-
-String result = switch (o) {
-    case int i    -> "Số nguyên: " + i;
-    case double d -> "Số thực: " + d;
-    case String s -> "Chuỗi: " + s;
-    default       -> "Không xác định";
-};
-
-System.out.println(result); // Số nguyên: 42
-```
-
-### **4\. Flexible Constructor Bodies (JEP 482 – 2nd Preview)**
-
-Cho phép viết **câu lệnh trước** `super()` **hoặc** `this()` trong constructor. Giúp constructor dễ viết, dễ thêm logic kiểm tra/khởi tạo.
-
-```java
-public class Parent {
-    Parent(int x) {
-        System.out.println("Parent: " + x);
-    }
-}
-```
-
-```java
-public class Child extends Parent {
-    Child(int x) {
-        if (x < 0) throw new IllegalArgumentException("x không được âm");
-        super(x); // Trước đây phải luôn là dòng đầu tiên
-        System.out.println("Child: " + x);
-    }
-}
-```
-
-```java
-public class App {
-    public static void main(String[] args) {
-        new Child(10);
-    }
-}
-```
-
-### **5\. Stream Gatherers (JEP 473 – 2nd Preview)**
-
-Thêm **Gatherers API** để mở rộng Stream pipeline với các thao tác phức tạp hơn, Giúp Stream API linh hoạt hơn nhiều.
-
-📌 Ví dụ: nhóm các phần tử liên tiếp thành cặp.
-
-```java
-import java.util.stream.*;
-import java.util.stream.Gatherers;
-
-public class App {
-    public static void main(String[] args) {
-        Stream.of(1, 2, 3, 4, 5, 6)
-              .gather(Gatherers.windowFixed(2)) // Gom thành cửa sổ 2 phần tử
-              .forEach(System.out::println);
-    }
-}
-```
-
-– Kết quả:
-
-```java
-[1, 2]
-[2, 3]
-[3, 4]
-[4, 5]
-[5, 6]
-```
-
-### **6\. Structured Concurrency (JEP 480 – 3rd Preview)**
-
-Quản lý nhiều tác vụ song song theo **cấu trúc** (giống như scope), dễ kiểm soát hơn. Dễ dùng hơn `CompletableFuture`, code ngắn gọn và an toàn hơn.
-
-```java
-import java.util.concurrent.*;
-
-public class App {
-    public static void main(String[] args) throws Exception {
-        try (var scope = new StructuredTaskScope.ShutdownOnFailure()) {
-            Future<String> f1 = scope.fork(() -> "Dữ liệu API 1");
-            Future<String> f2 = scope.fork(() -> "Dữ liệu API 2");
-
-            scope.join();             // Chờ tất cả xong
-            scope.throwIfFailed();    // Ném lỗi nếu có
-
-            System.out.println(f1.resultNow() + " + " + f2.resultNow());
-        }
-    }
-}
-```
-
-### **7\. Scoped Values (JEP 481 – 3rd Preview)**
-
-Thay thế `ThreadLocal` để chia sẻ **giá trị bất biến** giữa các thread hoặc virtual thread. An toàn và dễ quản lý hơn `ThreadLocal`
-
-```java
-import jdk.incubator.concurrent.ScopedValue;
-
-public class App {
-    static final ScopedValue<String> USER = ScopedValue.newInstance();
-
-    public static void main(String[] args) {
-        ScopedValue.runWhere(USER, "Tây Java", () -> {
-            System.out.println("Xin chào " + USER.get());
-        });
-    }
-}
-```
-
-### **8\. Vector API (JEP 469 – 8th Incubator)**
-
-Giúp tận dụng **SIMD instructions** để xử lý mảng nhanh hơn, Rất hữu ích cho AI/ML, xử lý ảnh, dữ liệu lớn.
-
-```java
-import jdk.incubator.vector.*;
-
-public class App {
-    public static void main(String[] args) {
-        var v1 = IntVector.fromArray(IntVector.SPECIES_256, new int[]{1,2,3,4}, 0);
-        var v2 = IntVector.fromArray(IntVector.SPECIES_256, new int[]{5,6,7,8}, 0);
-        var result = v1.add(v2);
-        System.out.println(result); // [6, 8, 10, 12]
-    }
-}
-```
-
-### **9\. Class-File API (JEP 466 – 2nd Preview)**
-
-API chuẩn để đọc/ghi file `.class` mà không cần thư viện bên ngoài (ASM, BCEL). Giúp lập trình meta (code gen, phân tích bytecode) trở nên dễ dàng hơn.
-
-```java
-import jdk.classfile.*;
-
-public class App {
-    public static void main(String[] args) {
-        ClassModel cm = ClassFile.of().parse(ClassFileExample.class);
-        cm.methods().forEach(m -> System.out.println(m.name()));
-    }
-}
-```
-
-### **10\. Thay đổi & Deprecation**
-
-*   **JEP 471**: Deprecate các phương thức truy cập bộ nhớ trong `sun.misc.Unsafe`.
+*   Tính năng **Pattern Matching for Switch** đã được hoàn thiện trong Java 21. Nó giúp viết mã ngắn gọn và dễ đọc hơn khi xử lý nhiều trường hợp của một giá trị.
     
-*   **String Templates** (preview ở Java 21/22) đã **bị loại bỏ** khỏi Java 23.
+*   Hỗ trợ pattern matching cho **class**, **record**, **sealed class** và **guarded patterns**.
     
 
-#### 🎯 Kết luận
+📌 Ví dụ:
 
-Java 23 mang đến nhiều cải tiến mạnh mẽ:
+```java
+static String formatterPattern(Object obj) {
+    return switch (obj) {
+        case Integer i -> String.format("int %d", i);
+        case Long l    -> String.format("long %d", l);
+        case Double d  -> String.format("double %f", d);
+        case String s  -> String.format("String %s", s);
+        default        -> obj.toString();
+    };
+}
+```
 
-*   Hoàn thiện Markdown Javadoc, Generational ZGC.
+### **3\. Record Patterns (Final Release)**
+
+**Record Patterns** cho phép giải nén trực tiếp các thành phần của record khi sử dụng pattern matching, giúp code dễ hiểu và ngắn gọn hơn.
+
+📌 Ví dụ:
+
+```java
+record Point(int x, int y) {}
+
+void printSum(Object obj) {
+    if (obj instanceof Point(int x, int y)) {
+        System.out.println(x + y);
+    }
+}
+```
+
+### **4\. Unnamed Patterns and Variables (Preview)**
+
+Java 21 giới thiệu **Unnamed Patterns** và **Unnamed Variables** để bỏ qua các giá trị không cần thiết trong pattern matching. Giúp mã ngắn gọn hơn khi chỉ quan tâm đến một phần dữ liệu.
+
+📌 Ví dụ:
+
+```java
+record Point(int x, int y) {}
+
+static void process(Point p) {
+    if (p instanceof Point(int x, _)) { // Bỏ qua giá trị y
+        System.out.println("X coordinate is: " + x);
+    }
+```
+
+### **5\. Sequenced Collections (Final Release)**
+
+*   Bổ sung API cho các collection có thứ tự, bao gồm: `SequencedCollection`, `SequencedSet`, `SequencedMap`.
     
-*   Preview: Pattern Matching với primitive, Stream Gatherers, Structured Concurrency, Scoped Values.
+*   Điểm nổi bật: Truy cập, thêm, xóa phần tử **đầu tiên** và **cuối cùng** dễ dàng.
     
-*   API mới: Class-File API, Vector API.
+
+📌 Ví dụ:
+
+```java
+SequencedCollection<String> sc = new ArrayList<>();
+sc.addFirst("First");
+sc.addLast("Last");
+```
+
+### **6\. Virtual Threads (Final Release)**
+
+**Virtual Threads** (thuộc dự án Loom) cho phép tạo hàng triệu luồng nhẹ trong JVM mà không ảnh hưởng lớn đến hiệu năng. Rất hữu ích cho ứng dụng **I/O bound** như web server, microservices.
+
+📌 Ví dụ:
+
+```java
+Thread.startVirtualThread(() -> {
+    System.out.println("Running in a virtual thread");
+});
+```
+
+### **7\. Structured Concurrency (Preview)**
+
+Cung cấp API để quản lý các tác vụ đồng thời theo cách có cấu trúc. Dễ dàng hủy, theo dõi, và xử lý lỗi trong nhóm tác vụ.
+
+📌 Ví dụ:
+
+```java
+try (var scope = new StructuredTaskScope.ShutdownOnFailure()) {
+    Future<String> future1 = scope.fork(() -> fetchDataFromAPI1());
+    Future<String> future2 = scope.fork(() -> fetchDataFromAPI2());
+    scope.join();              // Chờ cả hai tác vụ
+    scope.throwIfFailed();     // Nếu có lỗi thì ném ra
+}
+```
+
+### **8\. String Templates (Preview)**
+
+**String Templates** giúp chèn biến trực tiếp vào chuỗi một cách an toàn, ngắn gọn.
+
+📌 Ví dụ:
+
+```java
+String name = "Fox Dev";
+int age = 18;
+String message = STR."My name is \{name} and I am \{age} years old.";
+System.out.println(message);
+```
+
+### **9\. Generational ZGC (Final Release)**
+
+**ZGC** được nâng cấp thành **Generational ZGC**, cho phép phân biệt đối tượng **ngắn hạn** và **dài hạn** trong heap. Cải thiện hiệu năng và giảm pause time.
+
+### **10\. Preview và Incubator Features**
+
+*   Ngoài các tính năng chính thức, Java 21 còn giới thiệu:
+    
+*   **Scoped Values (Preview):** Quản lý dữ liệu bất biến giữa các thread/virtual thread.
+    
+*   **Foreign Function & Memory API (Preview):** Giao tiếp với native code mà không cần JNI.
+    
+*   **Vector API (Incubator):** Tận dụng SIMD để tăng hiệu suất xử lý dữ liệu.
+    
+
+### **11\. Deprecation và Removal**
+
+*   Một số API và tính năng cũ đã được:
+    
+*   Đánh dấu **@Deprecated**.
+    
+*   Hoặc **loại bỏ** để cải thiện hiệu năng, bảo mật, và giữ Java gọn gàng hơn.
+    
+
+👉 **Tóm lại:**  
+Java 21 (LTS) là phiên bản **cực kỳ quan trọng** với các tính năng thay đổi lớn về **concurrency (Virtual Threads, Structured Concurrency)**, **pattern matching**, **string templates**, và **ZGC**. Đây sẽ là nền tảng ổn định cho phát triển ứng dụng trong nhiều năm tới.
+

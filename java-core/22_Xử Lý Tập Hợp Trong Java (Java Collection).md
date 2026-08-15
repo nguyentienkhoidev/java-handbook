@@ -4,7 +4,7 @@
 
 **Java Collection** là một framework trong Java dùng để quản lý và thao tác với các nhóm đối tượng. Nó cung cấp một tập hợp các cấu trúc dữ liệu và các thuật toán để xử lý dữ liệu như thêm, xóa, duyệt qua, và sắp xếp các phần tử. Java Collection bao gồm `interfaces` và `classes` giúp lập trình viên dễ dàng quản lý dữ liệu theo cách hiệu quả hơn.
 
-![](https://cdn.tayjava.com/production/image/20250908_152148_pasted-1757319705720.png)
+![](../images/20250908_152148_pasted-1757319705720.png)
 
 ### **2\. Interfaces**
 
@@ -85,3 +85,4 @@ public class App {
     }
 }
 ```
+

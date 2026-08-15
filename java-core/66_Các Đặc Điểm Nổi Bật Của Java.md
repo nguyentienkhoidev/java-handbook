@@ -1,79 +1,90 @@
-# Các Đặc Điểm Nổi Bật Của Java
+# Các Đặc Điểm Nổi Bật Của Java 10
 
-**Java 12** (phát hành tháng 3/2019) là bản phát hành **non-LTS**, nhưng mang nhiều tính năng mới cho developer và cải tiến hiệu năng JVM. 
+**Java 10** (phát hành tháng 3/2018) là một **phiên bản ngắn hạn (non-LTS)**, nhưng vẫn mang đến nhiều cải tiến đáng chú ý cho lập trình viên. 
 
-Đây là các **đặc điểm nổi bật của Java 12**:
+Dưới đây là các **đặc điểm nổi bật của Java 10**:
 
-### **1\. JEP 325 – Switch Expressions (Preview)**
+### **1\. Local-Variable Type Inference (**`var`**)**
 
-*   Nâng cấp cú pháp `switch` thành **expression**, giúp code gọn hơn.
-    
-*   Có thể dùng `yield` để trả về giá trị.
-    
+Cho phép khai báo biến với từ khóa `var`, trình biên dịch tự suy luận kiểu dựa trên giá trị gán.
+
+Giúp code ngắn gọn và dễ đọc hơn.
 
 ```java
 public class App {
     public static void main(String[] args) {
-        String day = "MONDAY";
-        int result = switch (day) {
-            case "MONDAY", "FRIDAY", "SUNDAY" -> 6;
-            case "TUESDAY" -> 7;
-            case "THURSDAY", "SATURDAY" -> 8;
-            case "WEDNESDAY" -> 9;
-            default -> throw new IllegalStateException("Invalid day: " + day);
-        };
-        System.out.println(result);
+        var message = "Hello Java 10";   // kiểu String
+        var number  = 100;               // kiểu int
+        var list    = List.of("Java", "Python", "C++"); // kiểu List<String>
+
+        list.forEach(System.out::println);
     }
 }
 ```
 
-### **2\. JEP 189 – Shenandoah GC (Experimental)**
+### **2\. Unmodifiable Collections Enhancements**
 
-*   Một **low-pause GC** từ RedHat, giảm đáng kể thời gian pause khi thu gom rác.
-    
-*   Phù hợp cho ứng dụng thời gian thực (real-time systems).
-    
+Java 10 mở rộng API cho `List.copyOf()`, `Set.copyOf()`, `Map.copyOf()` để tạo **collection bất biến** từ một collection khác.
 
-### **3\. JEP 344 – Abortable Mixed Collections for G1 GC**
+```java
+List<String> oldList = new ArrayList<>(List.of("Java", "Kotlin"));
+List<String> newList = List.copyOf(oldList);  // bất biến
+```
 
-*   G1 GC có thể **dừng sớm** quá trình Mixed Collection nếu vượt quá thời gian cho phép.
-    
-*   Giúp giảm độ trễ (latency).
-    
+### **3\. Application Class-Data Sharing (AppCDS)**
 
-### **4\. JEP 346 – Promptly Return Unused Committed Memory from G1**
-
-*   G1 GC có thể **trả lại bộ nhớ không dùng** cho hệ điều hành nhanh hơn.
+*   Giúp **chia sẻ dữ liệu class giữa nhiều JVM** để giảm thời gian khởi động và sử dụng bộ nhớ hiệu quả hơn.
     
-*   Hữu ích khi ứng dụng có workload thay đổi liên tục.
+*   Không cần giấy phép thương mại (OpenJDK hỗ trợ miễn phí).
     
 
-### **5\. JEP 230 – Microbenchmark Suite**
+### **4\. Parallel Full GC for G1**
 
-*   Bộ framework microbenchmark tích hợp trong JDK (dựa trên JMH).
+*   Java 9 giới thiệu **G1 Garbage Collector** nhưng Full GC còn chạy **single-threaded**.
     
-*   Giúp developer dễ dàng viết benchmark kiểm tra hiệu năng.
-    
-
-### **6\. JEP 334 – JVM Constants API**
-
-*   API mới để xử lý **constant pool** của JVM.
-    
-*   Hữu ích cho công cụ phân tích `bytecode`, IDE, và frameworks.
+*   Java 10 cải tiến, cho phép Full GC chạy **song song (parallel)**, tăng tốc độ dọn rác.
     
 
-### **7\. JEP 305 – Pattern Matching for** `instanceof` **(Preview groundwork)**
+### **5\. Root Certificates**
 
-*   Đặt nền móng cho **pattern matching**.
+Java 10 tích hợp sẵn **root CA certificates** trong JDK, giúp cải thiện bảo mật và loại bỏ sự phụ thuộc vào JCE.
+
+### **6\. Thread-Local Handshakes**
+
+*   Cho phép dừng một thread riêng lẻ thay vì toàn bộ JVM.
     
-*   Hỗ trợ viết code gọn hơn khi dùng `instanceof`. (Tính năng đầy đủ xuất hiện ở Java 14+).
+*   Tăng hiệu suất trong việc quản lý thread.
     
 
-### **8\. JEP 341 – Default CDS Archives**
+### **7\. Experimental Java-Based JIT Compiler (Graal)**
 
-*   JDK phát hành kèm với **default class-data sharing (CDS) archives**, giảm thời gian startup JVM.
+*   Graal được tích hợp như một **JIT compiler** thử nghiệm.
+    
+*   Viết bằng Java, hứa hẹn thay thế **C2 compiler** trong tương lai.
     
 
-### **📌 Tóm Tắt Java 12**
+### **8\. Heap Allocation on Alternative Memory Devices**
 
-#Tính năngMô tả ngắn1Switch Expressions (Preview)`switch` trả về giá trị, code ngắn gọn2Shenandoah GCGC low-pause, giảm latency3G1 Abortable Mixed CollectionsDừng Mixed GC sớm nếu tốn nhiều thời gian4G1 Return Unused MemoryTrả bộ nhớ rảnh về OS nhanh hơn5Microbenchmark SuiteBộ công cụ benchmark tích hợp JDK6JVM Constants APIAPI xử lý constant pool7Pattern Matching groundworkBước đầu cho pattern matching `instanceof`8Default CDS ArchivesGiảm startup time JVM với CDS mặc định
+*   Cho phép JVM sử dụng bộ nhớ ngoài RAM chuẩn (ví dụ: **NVDIMM**) để quản lý heap.
+    
+*   Hữu ích cho hệ thống lớn, cần xử lý dữ liệu trong bộ nhớ tốc độ cao.
+    
+
+### **9\. Improved Container Awareness**
+
+*   JVM nhận biết tốt hơn khi chạy trong **Docker và container**.
+    
+*   Tự động tối ưu CPU và RAM theo giới hạn container, tránh chiếm toàn bộ tài nguyên host.
+    
+
+### **10\. Miscellaneous Changes**
+
+*   API `Optional.orElseThrow()` mặc định ném `NoSuchElementException`.
+    
+*   Các cải tiến nhỏ trong `var` cho lambda và try-with-resources.
+    
+
+### 📌 Tóm Tắt Java 10
+
+#Tính năngMô tả ngắn1`var`Suy luận kiểu biến cục bộ2`copyOf()`Tạo collection bất biến3AppCDSGiảm startup time, tiết kiệm bộ nhớ4Parallel Full GCTối ưu G1 GC với Full GC song song5Root CertificatesTích hợp chứng chỉ CA gốc6Thread-Local HandshakesDừng thread riêng lẻ thay vì toàn bộ JVM7Graal JITTrình biên dịch JIT bằng Java8Heap Allocation on NVMDùng bộ nhớ ngoài (NVDIMM) cho heap9Container AwarenessJVM tối ưu khi chạy trong Docker10API cải tiến`Optional.orElseThrow()`, try-with-resources
+

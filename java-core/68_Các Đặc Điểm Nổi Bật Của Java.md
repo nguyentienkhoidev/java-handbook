@@ -1,121 +1,80 @@
-# Các Đặc Điểm Nổi Bật Của Java
+# Các Đặc Điểm Nổi Bật Của Java 12
 
-**Java 14** (phát hành 3/2020) tiếp tục là một bản **non-LTS**, nhưng mang đến nhiều tính năng quan trọng, đặt nền móng cho các thay đổi lớn trong ngôn ngữ Java. 
+**Java 12** (phát hành tháng 3/2019) là bản phát hành **non-LTS**, nhưng mang nhiều tính năng mới cho developer và cải tiến hiệu năng JVM. 
 
-Dưới đây là các **đặc điểm nổi bật của Java 14**:
+Đây là các **đặc điểm nổi bật của Java 12**:
 
-### **1\. JEP 305 – Pattern Matching cho** `instanceof` **(Preview)**
+### **1\. JEP 325 – Switch Expressions (Preview)**
 
-Giúp code gọn hơn khi kiểm tra và ép kiểu với `instanceof`.
-
-**– Trước đây:**
-
-```java
-if (obj instanceof String) {
-    String s = (String) obj;
-    System.out.println(s.toLowerCase());
-}
-```
-
-**– Java 14:**
-
-```java
-if (obj instanceof String s) {
-    System.out.println(s.toLowerCase());
-}
-```
-
-→ Giảm boilerplate code, rõ ràng hơn.
-
-### **2\. JEP 359 – Records (Preview)**
-
-*   Cung cấp cú pháp mới để định nghĩa **class bất biến (immutable data carrier)**.
+*   Nâng cấp cú pháp `switch` thành **expression**, giúp code gọn hơn.
     
-*   Tự động sinh constructor, getters, `equals()`, `hashCode()`, `toString()`.
+*   Có thể dùng `yield` để trả về giá trị.
     
 
 ```java
-public record Person(String name, int age) {}
-
-public class RecordExample {
+public class App {
     public static void main(String[] args) {
-        Person p = new Person("Alice", 25);
-        System.out.println(p.name()); // Alice
-        System.out.println(p);       // Person[name=Alice, age=25]
+        String day = "MONDAY";
+        int result = switch (day) {
+            case "MONDAY", "FRIDAY", "SUNDAY" -> 6;
+            case "TUESDAY" -> 7;
+            case "THURSDAY", "SATURDAY" -> 8;
+            case "WEDNESDAY" -> 9;
+            default -> throw new IllegalStateException("Invalid day: " + day);
+        };
+        System.out.println(result);
     }
 }
 ```
 
-→ Giúp mô hình hóa **data transfer objects (DTOs)** dễ dàng hơn.
+### **2\. JEP 189 – Shenandoah GC (Experimental)**
 
-### **3\. JEP 358 – Helpful NullPointerExceptions**
-
-Khi gặp `NullPointerException`, JVM cung cấp **thông tin chi tiết hơn** thay vì chỉ báo dòng lỗi.
-
-📌 Ví dụ:
-
-```java
-String str = null;
-System.out.println(str.toUpperCase());
-```
-
-– Kết quả:
-
-```plaintext
-Exception: Cannot invoke "String.toUpperCase()" because "str" is null
-```
-
-→ Dễ debug hơn rất nhiều.
-
-### **4\. JEP 368 – Text Blocks (Preview 2)**
-
-*   Cải tiến thêm cho **Text Blocks (**`"""`**)** đã giới thiệu ở Java 13.
+*   Một **low-pause GC** từ RedHat, giảm đáng kể thời gian pause khi thu gom rác.
     
-*   Hỗ trợ tốt hơn cho xử lý chuỗi nhiều dòng.
+*   Phù hợp cho ứng dụng thời gian thực (real-time systems).
     
 
-```java
-String json = """
-              {
-                  "name": "Alice",
-                  "age": 25
-              }
-              """;
-```
+### **3\. JEP 344 – Abortable Mixed Collections for G1 GC**
 
-### **5\. JEP 361 – Switch Expressions (Standard)**
-
-Sau hai lần Preview (Java 12 & 13), **Switch Expressions** chính thức trở thành **chuẩn** trong Java 14.
-
-```java
-int numLetters = switch ("MONDAY") {
-    case "MONDAY", "FRIDAY", "SUNDAY" -> 6;
-    case "TUESDAY" -> 7;
-    case "THURSDAY", "SATURDAY" -> 8;
-    case "WEDNESDAY" -> 9;
-    default -> throw new IllegalStateException("Invalid day");
-};
-```
-
-### **6\. JEP 365 – ZGC trên Windows**
-
-*   **Z Garbage Collector (ZGC)** có thể chạy trên **Windows** (trước đó chỉ Linux).
+*   G1 GC có thể **dừng sớm** quá trình Mixed Collection nếu vượt quá thời gian cho phép.
     
-*   Hỗ trợ low-latency GC trên nhiều nền tảng hơn.
+*   Giúp giảm độ trễ (latency).
     
 
-### **7\. JEP 366 – Deprecate ParallelScavenge + SerialOld GC**
+### **4\. JEP 346 – Promptly Return Unused Committed Memory from G1**
 
-*   Bắt đầu **loại bỏ** sự kết hợp `ParallelScavenge + SerialOld`.
+*   G1 GC có thể **trả lại bộ nhớ không dùng** cho hệ điều hành nhanh hơn.
     
-*   Khuyến khích dùng G1 hoặc ZGC.
-    
-
-### **8\. JEP 364 – Packaging Tool (Incubator)**
-
-*   Giới thiệu `jpackage` – công cụ đóng gói ứng dụng Java thành file cài đặt gốc (Windows `.msi`, macOS `.pkg`, Linux `.deb`/`.rpm`).
+*   Hữu ích khi ứng dụng có workload thay đổi liên tục.
     
 
-### **📌 Tóm Tắt Java 14**
+### **5\. JEP 230 – Microbenchmark Suite**
 
-#Tính năngMô tả ngắn1Pattern Matching (Preview)Gọn hơn khi dùng `instanceof`2Records (Preview)Class bất biến, auto constructor + getters3Helpful NPEsNullPointerException chi tiết hơn4Text Blocks (Preview 2)Chuỗi nhiều dòng `"""` cải tiến5Switch ExpressionsChính thức thành chuẩn6ZGC trên WindowsHỗ trợ GC low-latency cho Windows7GC DeprecationLoại bỏ dần `ParallelScavenge + SerialOld`8jpackage (Incubator)Công cụ đóng gói app Java
+*   Bộ framework microbenchmark tích hợp trong JDK (dựa trên JMH).
+    
+*   Giúp developer dễ dàng viết benchmark kiểm tra hiệu năng.
+    
+
+### **6\. JEP 334 – JVM Constants API**
+
+*   API mới để xử lý **constant pool** của JVM.
+    
+*   Hữu ích cho công cụ phân tích `bytecode`, IDE, và frameworks.
+    
+
+### **7\. JEP 305 – Pattern Matching for** `instanceof` **(Preview groundwork)**
+
+*   Đặt nền móng cho **pattern matching**.
+    
+*   Hỗ trợ viết code gọn hơn khi dùng `instanceof`. (Tính năng đầy đủ xuất hiện ở Java 14+).
+    
+
+### **8\. JEP 341 – Default CDS Archives**
+
+*   JDK phát hành kèm với **default class-data sharing (CDS) archives**, giảm thời gian startup JVM.
+    
+
+### **📌 Tóm Tắt Java 12**
+
+#Tính năngMô tả ngắn1Switch Expressions (Preview)`switch` trả về giá trị, code ngắn gọn2Shenandoah GCGC low-pause, giảm latency3G1 Abortable Mixed CollectionsDừng Mixed GC sớm nếu tốn nhiều thời gian4G1 Return Unused MemoryTrả bộ nhớ rảnh về OS nhanh hơn5Microbenchmark SuiteBộ công cụ benchmark tích hợp JDK6JVM Constants APIAPI xử lý constant pool7Pattern Matching groundworkBước đầu cho pattern matching `instanceof`8Default CDS ArchivesGiảm startup time JVM với CDS mặc định
+

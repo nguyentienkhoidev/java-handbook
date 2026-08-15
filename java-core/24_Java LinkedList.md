@@ -4,7 +4,7 @@
 
 **LinkedList trong Java** là một trong những cấu trúc dữ liệu thuộc thư viện Java Collections Framework. Nó `implements` cả 2 interfaces là `List` và `Deque`, vì vậy nó có thể hoạt động như một danh sách hoặc một hàng đợi.
 
-![](https://cdn.tayjava.com/production/image/20250909_112129_pasted-1757391688134.png)
+![](../images/20250909_112129_pasted-1757391688134.png)
 
 ### **2\. Đặc điểm chính của LinkedList**
 
@@ -96,3 +96,4 @@ Danh sách: [Mít, Cam, Quýt, Dừa] Phần tử đầu: Cam Phần tử cuối
 **→ Hàng đợi (Queue)**: FIFO → `offer()`, `poll()`.
 
 **→ Ngăn xếp (Stack)**: LIFO → `push()`, `pop()`.
+

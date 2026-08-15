@@ -4,7 +4,7 @@
 
 **HashMap** là một triển khai của giao diện **Map**, **HashMap** cho phép lưu trữ các cặp khóa-giá trị (key-value pairs). **HashMap** sử dụng cấu trúc bảng băm (hash table) để lưu trữ các phần tử, cho phép truy cập nhanh chóng và hiệu quả cho các thao tác như thêm, tìm kiếm và xóa phần tử.
 
-![](https://cdn.tayjava.com/production/image/20250909_123244_pasted-1757395962195.png)
+![](../images/20250909_123244_pasted-1757395962195.png)
 
 ### **2\. Đặc điểm nổi bật của** `HashMap`
 
@@ -128,3 +128,5 @@ Nếu bạn cần key được **sắp xếp tự động** → dùng `TreeMap`.
 *   Khi bạn cần **duyệt theo thứ tự cụ thể** → hãy dùng `LinkedHashMap` hoặc `TreeMap`.
     
 *   Khi key không có `hashCode()` và `equals()` chuẩn xác → dễ gây bug (ví dụ key là một object tự viết nhưng chưa override đúng).
+    
+

@@ -1,177 +1,130 @@
-# Các Đặc Điểm Nổi Bật Của Java
+# Các Đặc Điểm Nổi Bật Của Java 20
 
-**Java 22** phát hành tháng 3/2024 mang đến nhiều cải tiến về cú pháp, hiệu năng và API. Đây là bản **non-LTS**, nhưng các tính năng mới của nó rất quan trọng cho những phiên bản LTS sau này.
+**Java 20** (phát hành tháng 3/2023). Đây cũng là bản phát hành **non-LTS**, tập trung cải tiến các tính năng **Preview/Incubator** đã giới thiệu ở Java 19, đặc biệt là nhóm **Project Loom** (Virtual Threads, Structured Concurrency) và **Pattern Matching**.
 
-### **1\. Statements Before** `super()` **trong Constructor (Preview)**
+### **1\. Record Patterns (Second Preview – JEP 432)**
 
-*   Trước đây:
-    
+Tiếp nối JEP 405 (Java 19). Cho phép **kết hợp record pattern với pattern khác** trong cùng biểu thức, tăng tính biểu đạt.
+
+📌 **Ví dụ:**
 
 ```java
-class Parent {
-    Parent(String msg) {
-        System.out.println("Parent: " + msg);
+record Point(int x, int y) {}
+
+static void printShape(Object obj) {
+    if (obj instanceof Point(int x, int y) && x == y) {
+        System.out.println("Hình vuông cạnh: " + x);
     }
 }
 ```
 
+👉 Giúp code dễ đọc hơn khi làm việc với record phức tạp.
+
+### **2\. Pattern Matching for Switch (Fourth Preview – JEP 433)**
+
+Bổ sung thêm rule an toàn & ngữ nghĩa mới. → Giúp `switch` xử lý tốt hơn với `null`, sealed class, và guard patterns (`when`).
+
+📌 **Ví dụ:**
+
 ```java
-class Child extends Parent {
-    Child(String msg) {
-        super(msg); // bắt buộc phải gọi đầu tiên
-        System.out.println("Child: " + msg);
+static String format(Object obj) {
+    return switch (obj) {
+        case String s when s.length() > 5 -> "Chuỗi dài";
+        case String s -> "Chuỗi ngắn";
+        case null -> "Null value";
+        default -> "Khác";
+    };
+}
+```
+
+👉 Viết code điều kiện gọn hơn, tránh nhiều `if-else`.
+
+### **3\. Virtual Threads (Second Preview – JEP 436)**
+
+Nâng cấp Virtual Threads từ Java 19 → Ổn định API, chuẩn bị hướng tới **tính năng chính thức trong bản LTS**.
+
+📌 **Ví dụ:**
+
+```java
+public class VirtualThreadDemo {
+    public static void main(String[] args) throws InterruptedException {
+        Thread t = Thread.startVirtualThread(() ->
+            System.out.println("Hello từ Virtual Thread!")
+        );
+        t.join();
     }
 }
 ```
 
-*   Java 22:
-    
+👉 Giúp chạy **hàng triệu kết nối song song** mà không cần hàng triệu OS threads.
+
+## 4\. **Structured Concurrency (Second Incubator – JEP 437)**
+
+Tiếp tục cải tiến JEP 428 (Java 19) → Cho phép gom nhóm task song song, dễ cancel, dễ propagate lỗi.
+
+📌 **Ví dụ:**
 
 ```java
-class Child extends Parent {
-    Child(String msg) {
-        System.out.println("Chuẩn bị khởi tạo...");
-        super(msg); // giờ có thể gọi sau
-        System.out.println("Child: " + msg);
-    }
+import jdk.incubator.concurrent.*;
+
+try (var scope = new StructuredTaskScope.ShutdownOnFailure()) {
+    Future<String> user  = scope.fork(() -> getUser());
+    Future<Integer> order = scope.fork(() -> getOrders());
+
+    scope.join();           // chờ tất cả task hoàn thành
+    scope.throwIfFailed();  // ném exception nếu có lỗi
+
+    System.out.println(user.result() + " có " + order.result() + " đơn hàng.");
 }
 ```
 
-→ Giúp code **linh hoạt hơn** khi cần thực hiện logic trước khi gọi constructor cha.
+👉 Giúp **quản lý concurrency dễ như lập trình tuần tự**.
 
-### **2\. String Templates (Preview – Lần 2)**
+### **5\. Scoped Values (Incubator – JEP 429)**
 
-```java
-String name = "Java";
-int version = 22;
+Cung cấp cách **chia sẻ dữ liệu bất biến** giữa các thread, đặc biệt hữu ích cho Virtual Threads → Là giải pháp thay thế `ThreadLocal`, nhưng **nhanh hơn, an toàn hơn**.
 
-// Trước đây
-String oldWay = "Xin chào, " + name + " " + version;
-
-// Java 22
-String newWay = STR."Xin chào, \{name} \{version}";
-System.out.println(newWay); // Output: Xin chào, Java 22
-```
-
-→ Cú pháp ngắn gọn, **tránh rối rắm khi nối chuỗi** hoặc dùng `String.format()`.
-
-### **3\. Scoped Values (Preview – Lần 2)**
+📌 **Ví dụ:**
 
 ```java
 import jdk.incubator.concurrent.ScopedValue;
 
-public class App {
+public class ScopedValueDemo {
     static final ScopedValue<String> USER = ScopedValue.newInstance();
 
     public static void main(String[] args) {
-        ScopedValue.where(USER, "TayJava").run(() -> {
+        ScopedValue.where(USER, "Fox Dev").run(() -> {
             System.out.println("Xin chào " + USER.get());
         });
     }
 }
 ```
 
-→ Scoped Value chỉ tồn tại trong **phạm vi định nghĩa**, an toàn hơn **ThreadLocal** và tránh rò rỉ bộ nhớ.
+👉 Giúp quản lý dữ liệu gắn liền với luồng trong môi trường nhiều virtual threads.
 
-### **4\. Structured Concurrency (Preview – Lần 2)**
+### **6\. Foreign Function & Memory API (Second Preview – JEP 434)**
 
-```java
-import java.util.concurrent.*;
-import jdk.incubator.concurrent.StructuredTaskScope;
+Tiếp tục cải tiến từ Java 19 (JEP 424) → Hỗ trợ tốt hơn cho việc gọi native code (C/C++) và quản lý memory ngoài heap.
 
-public class App {
-    public static void main(String[] args) throws Exception {
-        try (var scope = new StructuredTaskScope.ShutdownOnFailure()) {
-            Future<String> f1 = scope.fork(() -> fetchUser());
-            Future<String> f2 = scope.fork(() -> fetchOrders());
-            
-            scope.join().throwIfFailed();
-            
-            System.out.println(f1.resultNow() + " - " + f2.resultNow());
-        }
-    }
-
-    static String fetchUser() { return "User: TayJava"; }
-    static String fetchOrders() { return "Orders: 5"; }
-}
-```
-
-→ Nếu một task lỗi, cả scope sẽ dừng, giúp code **dễ quản lý và an toàn hơn**.
-
-### **5\. Foreign Function & Memory API (Third Preview)**
-
-📌 Ví dụ gọi hàm C `strlen` từ Java:
+📌 **Ví dụ:**
 
 ```java
 import java.lang.foreign.*;
-import java.lang.invoke.MethodHandle;
 
-public class App {
-    public static void main(String[] args) throws Throwable {
-        Linker linker = Linker.nativeLinker();
-        SymbolLookup stdlib = linker.defaultLookup();
-
-        MethodHandle strlen = linker.downcallHandle(
-            stdlib.find("strlen").get(),
-            FunctionDescriptor.of(ValueLayout.JAVA_LONG, ValueLayout.ADDRESS)
-        );
-
-        try (Arena arena = Arena.openConfined()) {
-            MemorySegment cString = arena.allocateUtf8String("Xin chào Java 22");
-            long length = (long) strlen.invoke(cString);
-            System.out.println("Độ dài chuỗi: " + length);
+public class FFMExample {
+    public static void main(String[] args) {
+        try (Arena arena = Arena.ofConfined()) {
+            MemorySegment seg = arena.allocate(50);
+            seg.setUtf8String(0, "Java 20 FFM API");
+            System.out.println(seg.getUtf8String(0));
         }
     }
 }
 ```
 
- Cho phép gọi **native code** dễ dàng, thay thế **JNI** phức tạp.
+👉 Quan trọng cho **AI/ML, hệ thống hiệu năng cao**.
 
-### **6\. Vector API (Seventh Incubator)**
+### **✅ Tóm tắt Java 20**
 
-📌 Ví dụ cộng 2 mảng số nguyên bằng Vector API:
+JEPTính năngTrạng tháiMô tả**432**Record PatternsPreviewGiải nén record, kết hợp pattern**433**Pattern Matching for SwitchPreviewSwitch hỗ trợ guard pattern, null**436**Virtual ThreadsPreviewThread nhẹ, scale hàng triệu kết nối**437**Structured ConcurrencyIncubatorGom nhóm task song song, quản lý dễ hơn**429**Scoped ValuesIncubatorChia sẻ dữ liệu bất biến giữa threads**434**Foreign Function & Memory APIPreviewGọi native code, quản lý bộ nhớ an toàn
 
-```java
-import jdk.incubator.vector.*;
-
-public class App {
-    public static void main(String[] args) {
-        int[] a = {1, 2, 3, 4};
-        int[] b = {5, 6, 7, 8};
-        int[] c = new int[4];
-
-        var species = IntVector.SPECIES_PREFERRED;
-        var va = IntVector.fromArray(species, a, 0);
-        var vb = IntVector.fromArray(species, b, 0);
-        var vc = va.add(vb);
-        vc.intoArray(c, 0);
-
-        System.out.println(java.util.Arrays.toString(c)); // [6, 8, 10, 12]
-    }
-}
-```
-
-Tận dụng CPU SIMD → **tăng tốc xử lý dữ liệu lớn**.
-
-### **7\. Cải Tiến Khác**
-
-*   **Virtual Threads** tiếp tục được tối ưu → đơn giản hóa lập trình song song.
-    
-*   **Pattern Matching** cho `switch` ổn định hơn:
-    
-*   **Garbage Collection (GC)** nhanh hơn và tiêu tốn ít tài nguyên hơn.
-    
-
-```java
-static String formatter(Object obj) {
-    return switch (obj) {
-        case Integer i -> "Số nguyên: " + i;
-        case String s -> "Chuỗi: " + s;
-        default -> "Khác";
-    };
-}
-```
-
-#### 📌 Kết Luận
-
-Java 22 mang đến nhiều tính năng **đột phá và thực tế** như String Templates, Scoped Values, Structured Concurrency và Foreign Function API. Đây là bước đệm cho các bản **LTS tiếp theo**.

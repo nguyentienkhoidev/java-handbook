@@ -4,7 +4,7 @@
 
 **ArrayList** là một lớp thuộc gói `java.util`, ArrayList là một trong những triển khai phổ biến nhất của `interface List.` `ArrayList` là một mảng động, có khả năng thay đổi kích thước khi các phần tử được thêm vào hoặc xóa khỏi danh sách. Đây là một lớp rất hữu ích khi bạn cần lưu trữ một danh sách các phần tử và cần thao tác với chúng một cách linh hoạt.
 
-![](https://cdn.tayjava.com/production/image/20250909_110929_pasted-1757390967808.png)
+![](../images/20250909_110929_pasted-1757390967808.png)
 
 ### **2\. Các đặc điểm chính của** `ArrayList`
 
@@ -149,3 +149,5 @@ System.out.println("Có quả xoài không? " + isContain);
 *   Sử dụng `ArrayList` khi bạn cần một danh sách mà việc truy cập phần tử theo chỉ số là nhanh chóng và không cần phải thêm hoặc xóa phần tử quá nhiều.
     
 *   Nếu cần thao tác thêm/xóa phần tử thường xuyên ở đầu hoặc giữa danh sách, có thể cân nhắc sử dụng **LinkedList** thay thế.
+    
+

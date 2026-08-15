@@ -1,194 +1,134 @@
-# Các Đặc Điểm Nổi Bật Của Java
+# Các Đặc Điểm Nổi Bật Của Java 16
 
-**Java 18** (phát hành tháng 3/2022) **không phải bản LTS** (Long-Term Support) như Java 17, nhưng nó mang đến nhiều tính năng thử nghiệm (preview/incubator) và cải tiến đáng chú ý.
+**Java 16** (phát hành tháng 3/2021, **non-LTS**) tiếp tục hoàn thiện các tính năng từ Java 14–15, đồng thời mang đến nhiều cải tiến quan trọng cho **ngôn ngữ**, **JVM**, và **API**. 
 
-Dưới đây là các đặc điểm nổi bật:
+Đây là bản phát hành chuẩn hóa một số tính năng vốn đã ở trạng thái _Preview_ trước đó.
 
-### **1\. UTF-8 là Charset Mặc Định (JEP 400)**
+### **1\. JEP 394 – Pattern Matching for** `instanceof` **(Standard)**
 
-*   Trước Java 18: charset mặc định phụ thuộc hệ điều hành (Windows: `Cp1252`, Linux/macOS: `UTF-8`).
-    
-*   Từ Java 18: **UTF-8 mặc định trên mọi nền tảng**.
-    
-
-📌 **Lợi ích:**
-
-*   Viết code xử lý chuỗi nhất quán trên mọi hệ điều hành.
-    
-*   Giảm lỗi khi đọc/ghi file text chứa ký tự đặc biệt.
-    
-
-📌 **Ví dụ:**
+Sau 2 lần Preview (Java 14, 15), tính năng **Pattern Matching cho** `instanceof` chính thức thành chuẩn.
 
 ```java
-import java.nio.file.*;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
+Object obj = "Hello Java 16";
 
-public class Utf8Example {
-    public static void main(String[] args) throws IOException {
-        Path path = Paths.get("hello.txt");
-        Files.writeString(path, "Xin chào Tây Java!");
-        String content = Files.readString(path);
-        System.out.println(content);
+if (obj instanceof String s) {
+    System.out.println(s.toUpperCase()); // HELLO JAVA 16
+}
+```
+
+→ Giúp code ngắn gọn, giảm ép kiểu thủ công.
+
+### **2\. JEP 395 – Records (Standard)**
+
+Sau 2 lần Preview (Java 14, 15), **Records** chính thức trở thành chuẩn trong Java 16.
+
+Dùng để định nghĩa **data carrier class bất biến**.
+
+```java
+public record Person(String name, int age) {}
+```
+
+```java
+public class App {
+    static void main() {
+        Person p = new Person("Alice", 25);
+        System.out.println(p.name()); // Alice
+        System.out.println(p);        // Person[name=Alice, age=25] 
     }
 }
 ```
 
-👉 Java 18 mặc định sử dụng UTF-8, không cần khai báo thủ công.
+→ Tự động có `constructor`, `equals()`, `hashCode()`, `toString()`.
 
-### **2\. Simple Web Server (JEP 408)**
+### **3\. JEP 376 – ZGC: Concurrent Thread-Stack Processing**
 
-*   Cung cấp **HTTP file server nhẹ** tích hợp sẵn trong JDK.
+*   Cải tiến **Z Garbage Collector** với khả năng xử lý **thread stack song song**.
     
-*   Phục vụ tĩnh (static files), hữu ích cho học tập, thử nghiệm REST API hoặc SPA.
-    
-
-📌 **Cách chạy:**
-
-```java
-jwebserver
-```
-
-Mặc định: cổng `8000`, root là thư mục hiện tại.
-
-Có thể tùy chỉnh:
-
-```java
-jwebserver -p 9000 -d /home/user/site
-```
-
-📌 **Ví dụ truy cập:**
-
-```html
-http://localhost:8000/index.html
-```
-
-👉 Thay vì cài Apache/Nginx, ta có server tích hợp trong JDK.
-
-### **3\. Code Snippets trong Javadoc (JEP 413)**
-
-*   Bổ sung thẻ `@snippet` trong Javadoc.
-    
-*   Hỗ trợ **highlight, đánh số dòng, chỉ ra lỗi** trong code.
+*   Giúp **giảm độ trễ (latency)** hơn nữa.
     
 
-📌 **Ví dụ Javadoc:**
+### **4\. JEP 387 – Elastic Metaspace**
 
-```java
-/**
- * Tính tổng hai số nguyên.
- *
- * @snippet :
- * int sum = 3 + 4;
- * System.out.println(sum); // 7
- */
-public class Calculator {
-    public int add(int a, int b) {
-        return a + b;
-    }
-}
-```
-
-👉 Javadoc trở nên trực quan và chuyên nghiệp hơn.
-
-### **4\. Pattern Matching cho Switch (Second Preview – JEP 420)**
-
-Mở rộng `switch` để dùng **pattern matching** thay vì `instanceof` + ép kiểu thủ công.
-
-📌 **Ví dụ trước Java 18:**
-
-```java
-if (obj instanceof String) {
-    String s = (String) obj;
-    System.out.println("Length: " + s.length());
-}
-```
-
-📌 **Với Java 18 (switch + pattern matching):**
-
-```java
-static String format(Object obj) {
-    return switch (obj) {
-        case Integer i -> "Số nguyên: " + i;
-        case String s  -> "Chuỗi: " + s.toUpperCase();
-        case null      -> "null";
-        default        -> "Khác";
-    };
-}
-```
-
-👉 Code ngắn gọn, an toàn hơn.
-
-### **5\. Vector API (Third Incubator – JEP 417)**
-
-*   API cho phép **tận dụng SIMD (Single Instruction Multiple Data)**.
+*   JVM có thể **trả lại vùng Metaspace không dùng** về hệ điều hành.
     
-*   Xử lý mảng số học nhanh hơn nhiều so với vòng lặp for truyền thống.
+*   Tối ưu việc quản lý bộ nhớ, giảm dung lượng sử dụng.
     
 
-📌 **Ví dụ:**
+### **5\. JEP 338 – Vector API (Incubator)**
+
+*   API mới hỗ trợ **tính toán vector hóa** (SIMD) để xử lý dữ liệu số nhanh hơn.
+    
+*   Hữu ích cho **machine learning, xử lý ảnh, big data**.
+    
 
 ```java
 import jdk.incubator.vector.*;
 
-public class VectorExample {
+public class App {
     public static void main(String[] args) {
-        var species = IntVector.SPECIES_PREFERRED;
-        int[] a = {1,2,3,4};
-        int[] b = {5,6,7,8};
-        int[] c = new int[4];
+        float[] arrA = {1, 2, 3, 4, 5, 6, 7, 8};
+        float[] arrB = {2, 2, 2, 2, 2, 2, 2, 2};
+        float[] result = new float[8];
 
-        var va = IntVector.fromArray(species, a, 0);
-        var vb = IntVector.fromArray(species, b, 0);
-        var vc = va.add(vb);
-        vc.intoArray(c, 0);
+        FloatVector a = FloatVector.fromArray(FloatVector.SPECIES_256, arrA, 0);
+        FloatVector b = FloatVector.fromArray(FloatVector.SPECIES_256, arrB, 0);
+        FloatVector c = a.mul(b);
 
-        System.out.println(java.util.Arrays.toString(c)); // [6, 8, 10, 12]
-    }
-}
-```
+        c.intoArray(result, 0);
 
-👉 Dùng trong AI/ML, game, xử lý ảnh, big data.
-
-## 6\. **Foreign Function & Memory API (Second Incubator – JEP 419)**
-
-*   Thay thế JNI (Java Native Interface).
-    
-*   Cho phép:
-    
-*   Gọi hàm native (C/C++).
-    
-*   Truy cập bộ nhớ ngoài Java heap an toàn.
-    
-
-📌 **Ví dụ:**
-
-```java
-import jdk.incubator.foreign.*;
-
-public class ForeignExample {
-    public static void main(String[] args) {
-        try (var arena = Arena.ofConfined()) {
-            MemorySegment segment = arena.allocate(64);
-            segment.setUtf8String(0, "Hello từ Java 18!");
-            System.out.println(segment.getUtf8String(0));
+        for (float f : result) {
+            System.out.print(f + " ");
         }
     }
 }
 ```
 
-👉 Hữu ích trong lập trình hệ thống, high-performance computing.
+– Kết quả:
 
-### **7\. Deprecations & Removals**
+```plaintext
+2.0 4.0 6.0 8.0 10.0 12.0 14.0 16.0
+```
 
-*   Một số API cũ bị loại bỏ/dừng hỗ trợ:
+### **6\. JEP 390 – Warnings for Value-Based Classes**
+
+*   Một số class giá trị (`value-based classes` như `Optional`, `LocalDateTime`) sẽ cảnh báo nếu bị sử dụng sai (ví dụ: đồng bộ hóa `synchronized` trên chúng).
     
-*   `SecurityManager` (đang deprecated, chuẩn bị loại bỏ).
+
+### **7\. JEP 392 – Packaging Tool (**`jpackage`**)**
+
+Công cụ `jpackage` (xuất hiện ở Java 14 dạng incubator) chính thức thành chuẩn.
+
+Cho phép **đóng gói ứng dụng Java thành installer gốc**:
+
+*   Windows: `.msi`
     
-*   Một số cờ JVM cũ bị bỏ.
+*   macOS: `.pkg`
+    
+*   Linux: `.deb` / `.rpm`
     
 
-## ✅ Tóm tắt Java 18
+### **8\. JEP 393 – Foreign-Memory Access API (Third Incubator)**
 
-JEPTính năngMô tả**400**UTF-8 Default CharsetĐảm bảo encoding nhất quán trên mọi OS**408**Simple Web ServerServer HTTP nhẹ tích hợp sẵn**413**Javadoc SnippetsTài liệu có code minh họa trực quan**420**Switch Pattern MatchingSwitch hỗ trợ pattern, ngắn gọn hơn**417**Vector API (Incubator)Xử lý SIMD hiệu năng cao**419**Foreign Function & Memory API (Incubator)Gọi C/C++ an toàn, quản lý memory ngoài heap
+*   Tiếp tục thử nghiệm API cho phép **truy cập bộ nhớ ngoài Java heap** một cách an toàn và hiệu quả.
+    
+*   Đây là một phần trong **Project Panama**.
+    
+
+### **9\. JEP 394 – Unix-Domain Socket Channels**
+
+*   Bổ sung API cho **Unix-Domain Socket**, thay vì chỉ hỗ trợ TCP/IP.
+    
+*   Hữu ích cho **giao tiếp giữa các process trên cùng hệ thống** (IPC).
+    
+
+### **10\. JEP 347 – C++14 Language Features cho JDK Internals**
+
+*   Bên trong mã nguồn JDK, compiler được nâng cấp để hỗ trợ **C++14** (thay vì C++98 cũ).
+    
+*   Không ảnh hưởng trực tiếp đến lập trình viên Java, nhưng giúp phát triển JDK dễ hơn.
+    
+
+### 📌 Tóm Tắt Java 16
+
+#Tính năngMô tả1Pattern Matching `instanceof`Chính thức, gọn hơn khi ép kiểu2RecordsClass bất biến chuẩn hóa3ZGC cải tiếnXử lý thread stack song song4Elastic MetaspaceJVM trả lại bộ nhớ không dùng5Vector API (Incubator)Tính toán SIMD cho hiệu suất cao6Warnings for Value-Based ClassesCảnh báo dùng sai Optional, DateTime…7Packaging Tool (`jpackage`)Đóng gói app thành installer gốc8Foreign-Memory Access APIQuản lý bộ nhớ ngoài heap9Unix-Domain Socket ChannelsIPC nhanh hơn qua Unix socket10C++14 cho JDKJDK nội bộ nâng cấp compiler
+

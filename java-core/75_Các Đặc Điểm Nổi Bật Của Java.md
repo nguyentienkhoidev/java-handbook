@@ -1,152 +1,176 @@
-# Các Đặc Điểm Nổi Bật Của Java
+# Các Đặc Điểm Nổi Bật Của Java 19
 
-### **1\. Giới thiệu**
+**Java 19** (phát hành tháng 9/2022), tập trung vào các tính năng chính (JEP) theo nhóm **preview / incubator / ổn định** để bạn có thể dùng làm tài liệu giảng dạy hoặc nghiên cứu.
 
-Java 21 là bản phát hành **Hỗ trợ Dài hạn (LTS – Long Term Support)** được công bố vào tháng 9 năm 2023. Phiên bản này mang đến nhiều tính năng mới và cải tiến trong các lĩnh vực **ngôn ngữ**, **thư viện** và **JVM**.
+### **1\. Record Patterns (Preview – JEP 405)**
 
-Java 21 đặc biệt nổi bật với:
-
-*   Quản lý luồng hiện đại nhờ **Virtual Threads** và **Structured Concurrency**.
+*   Mở rộng **Pattern Matching** cho phép giải nén (deconstruct) dữ liệu trong **Record** trực tiếp.
     
-*   Hỗ trợ mạnh mẽ cho **pattern matching**.
-    
-*   Cải tiến về **chuỗi (string templates)**.
-    
-*   Nâng cao hiệu suất với **Generational ZGC**.
+*   Giúp viết code ngắn gọn, dễ đọc khi làm việc với record.
     
 
-👉 Những tính năng này giúp phát triển các ứng dụng **lớn, phức tạp** nhưng vẫn giữ được **an toàn, hiệu quả và dễ đọc**.
-
-### **2\. Pattern Matching for Switch (Final Release)**
-
-*   Tính năng **Pattern Matching for Switch** đã được hoàn thiện trong Java 21. Nó giúp viết mã ngắn gọn và dễ đọc hơn khi xử lý nhiều trường hợp của một giá trị.
-    
-*   Hỗ trợ pattern matching cho **class**, **record**, **sealed class** và **guarded patterns**.
-    
-
-📌 Ví dụ:
+📌 **Ví dụ trước đây:**
 
 ```java
-static String formatterPattern(Object obj) {
+record Point(int x, int y) {}
+
+static void print(Object obj) {
+    if (obj instanceof Point p) {
+        int x = p.x();
+        int y = p.y();
+        System.out.println("x=" + x + ", y=" + y);
+    }
+}
+```
+
+📌 **Java 19 với Record Patterns:**
+
+```java
+record Point(int x, int y) {}
+
+static void print(Object obj) {
+    if (obj instanceof Point(int x, int y)) {
+        System.out.println("x=" + x + ", y=" + y);
+    }
+}
+```
+
+👉 Ngắn gọn hơn, phù hợp với lập trình hàm.
+
+### **2\. Pattern Matching for Switch (Second Preview – JEP 427)**
+
+*   Tiếp tục cải tiến từ Java 17/18.
+    
+*   Cho phép `switch` hoạt động trực tiếp với kiểu dữ liệu phức tạp, thay vì chỉ primitive hoặc String.
+    
+
+📌 **Ví dụ:**
+
+```java
+static String sample(Object obj) {
     return switch (obj) {
-        case Integer i -> String.format("int %d", i);
-        case Long l    -> String.format("long %d", l);
-        case Double d  -> String.format("double %f", d);
-        case String s  -> String.format("String %s", s);
-        default        -> obj.toString();
+        case String s -> "Chuỗi có độ dài " + s.length();
+        case Integer i && i > 0 -> "Số nguyên dương " + i;
+        case null -> "Null";
+        default -> "Khác";
     };
 }
 ```
 
-### **3\. Record Patterns (Final Release)**
+👉 Linh hoạt, ngắn gọn, tránh nhiều `instanceof` lặp lại.
 
-**Record Patterns** cho phép giải nén trực tiếp các thành phần của record khi sử dụng pattern matching, giúp code dễ hiểu và ngắn gọn hơn.
+### **3\. Virtual Threads (Preview – JEP 425)**
 
-📌 Ví dụ:
+*   Tính năng nổi bật nhất của Java 19 🎉.
+    
+*   **Virtual Thread**: một loại thread nhẹ do JVM quản lý (không gắn trực tiếp với OS thread).
+    
+*   Giúp xử lý **hàng triệu kết nối đồng thời** mà không tốn quá nhiều tài nguyên.
+    
+
+📌 **Ví dụ:**
 
 ```java
-record Point(int x, int y) {}
-
-void printSum(Object obj) {
-    if (obj instanceof Point(int x, int y)) {
-        System.out.println(x + y);
+public class SampleVirtualThread {
+    public static void main(String[] args) throws InterruptedException {
+        Thread.startVirtualThread(() -> {
+            System.out.println("Hello từ Virtual Thread!");
+        }).join();
     }
 }
 ```
 
-### **4\. Unnamed Patterns and Variables (Preview)**
+📌 **Ứng dụng:**
 
-Java 21 giới thiệu **Unnamed Patterns** và **Unnamed Variables** để bỏ qua các giá trị không cần thiết trong pattern matching. Giúp mã ngắn gọn hơn khi chỉ quan tâm đến một phần dữ liệu.
-
-📌 Ví dụ:
-
-```java
-record Point(int x, int y) {}
-
-static void process(Point p) {
-    if (p instanceof Point(int x, _)) { // Bỏ qua giá trị y
-        System.out.println("X coordinate is: " + x);
-    }
-```
-
-### **5\. Sequenced Collections (Final Release)**
-
-*   Bổ sung API cho các collection có thứ tự, bao gồm: `SequencedCollection`, `SequencedSet`, `SequencedMap`.
+*   Server web, microservices, xử lý đồng thời khối lượng lớn request (giống Go’s goroutine).
     
-*   Điểm nổi bật: Truy cập, thêm, xóa phần tử **đầu tiên** và **cuối cùng** dễ dàng.
+*   Hướng tới **Project Loom** (lập trình concurrent dễ dàng hơn).
     
 
-📌 Ví dụ:
+### **4\. Structured Concurrency (Incubator – JEP 428)**
+
+*   Cung cấp API giúp quản lý nhiều task chạy đồng thời dễ dàng hơn.
+    
+*   Giúp gom nhóm các thread ảo lại để quản lý lifecycle đồng bộ, dễ debug, dễ cancel.
+    
+
+📌 **Ví dụ:**
 
 ```java
-SequencedCollection<String> sc = new ArrayList<>();
-sc.addFirst("First");
-sc.addLast("Last");
-```
+import jdk.incubator.concurrent.*;
 
-### **6\. Virtual Threads (Final Release)**
-
-**Virtual Threads** (thuộc dự án Loom) cho phép tạo hàng triệu luồng nhẹ trong JVM mà không ảnh hưởng lớn đến hiệu năng. Rất hữu ích cho ứng dụng **I/O bound** như web server, microservices.
-
-📌 Ví dụ:
-
-```java
-Thread.startVirtualThread(() -> {
-    System.out.println("Running in a virtual thread");
-});
-```
-
-### **7\. Structured Concurrency (Preview)**
-
-Cung cấp API để quản lý các tác vụ đồng thời theo cách có cấu trúc. Dễ dàng hủy, theo dõi, và xử lý lỗi trong nhóm tác vụ.
-
-📌 Ví dụ:
-
-```java
 try (var scope = new StructuredTaskScope.ShutdownOnFailure()) {
-    Future<String> future1 = scope.fork(() -> fetchDataFromAPI1());
-    Future<String> future2 = scope.fork(() -> fetchDataFromAPI2());
-    scope.join();              // Chờ cả hai tác vụ
-    scope.throwIfFailed();     // Nếu có lỗi thì ném ra
+    Future<String> user  = scope.fork(() -> findUser());
+    Future<Integer> order = scope.fork(() -> fetchOrders());
+
+    scope.join();           // chờ tất cả task
+    scope.throwIfFailed();  // ném exception nếu có lỗi
+
+    System.out.println(user.result() + " có " + order.result() + " đơn hàng.");
 }
 ```
 
-### **8\. String Templates (Preview)**
+👉 Code xử lý song song trở nên **an toàn, dễ đọc, dễ bảo trì**.
 
-**String Templates** giúp chèn biến trực tiếp vào chuỗi một cách an toàn, ngắn gọn.
+### 5\. **Foreign Function & Memory API (Preview – JEP 424)**
 
-📌 Ví dụ:
+*   Tiếp tục thay thế **JNI**.
+    
+*   Cung cấp API để gọi code native và truy cập bộ nhớ ngoài heap.
+    
+*   Ở Java 19: nâng cấp từ incubator → preview.
+    
+
+📌 **Ví dụ:**
 
 ```java
-String name = "Tây Java";
-int age = 18;
-String message = STR."My name is \{name} and I am \{age} years old.";
-System.out.println(message);
+import java.lang.foreign.*;
+
+public class FFMSample {
+    public static void main(String[] args) {
+        try (Arena arena = Arena.ofConfined()) {
+            MemorySegment segment = arena.allocate(100);
+            segment.setUtf8String(0, "Xin chào Java 19!");
+            System.out.println(segment.getUtf8String(0));
+        }
+    }
+}
 ```
 
-### **9\. Generational ZGC (Final Release)**
+👉 Quan trọng cho **AI, ML, đồ họa, high-performance computing**.
 
-**ZGC** được nâng cấp thành **Generational ZGC**, cho phép phân biệt đối tượng **ngắn hạn** và **dài hạn** trong heap. Cải thiện hiệu năng và giảm pause time.
+### **6\. Vector API (Fourth Incubator – JEP 426)**
 
-### **10\. Preview và Incubator Features**
-
-*   Ngoài các tính năng chính thức, Java 21 còn giới thiệu:
+*   API cho xử lý SIMD (vectorized computation).
     
-*   **Scoped Values (Preview):** Quản lý dữ liệu bất biến giữa các thread/virtual thread.
-    
-*   **Foreign Function & Memory API (Preview):** Giao tiếp với native code mà không cần JNI.
-    
-*   **Vector API (Incubator):** Tận dụng SIMD để tăng hiệu suất xử lý dữ liệu.
+*   Cho phép thao tác mảng số học hiệu năng cao hơn vòng lặp thường.
     
 
-### **11\. Deprecation và Removal**
+📌 **Ví dụ:**
 
-*   Một số API và tính năng cũ đã được:
-    
-*   Đánh dấu **@Deprecated**.
-    
-*   Hoặc **loại bỏ** để cải thiện hiệu năng, bảo mật, và giữ Java gọn gàng hơn.
-    
+```java
+import jdk.incubator.vector.*;
 
-👉 **Tóm lại:**  
-Java 21 (LTS) là phiên bản **cực kỳ quan trọng** với các tính năng thay đổi lớn về **concurrency (Virtual Threads, Structured Concurrency)**, **pattern matching**, **string templates**, và **ZGC**. Đây sẽ là nền tảng ổn định cho phát triển ứng dụng trong nhiều năm tới.
+public class VectorSample {
+    public static void main(String[] args) {
+        var species = FloatVector.SPECIES_PREFERRED;
+        float[] a = {1, 2, 3, 4};
+        float[] b = {5, 6, 7, 8};
+        float[] c = new float[4];
+
+        var va = FloatVector.fromArray(species, a, 0);
+        var vb = FloatVector.fromArray(species, b, 0);
+        var vc = va.add(vb);
+        vc.intoArray(c, 0);
+
+        System.out.println(java.util.Arrays.toString(c)); // [6.0, 8.0, 10.0, 12.0]
+    }
+}
+```
+
+👉 Dùng nhiều trong **Big Data, AI/ML, xử lý ảnh, game engine**.
+
+### **✅ Tóm tắt Java 19**
+
+JEPTính năngTrạng tháiMô tả**405**Record PatternsPreviewGiải nén dữ liệu trực tiếp trong record**427**Pattern Matching for SwitchPreviewSwitch hỗ trợ pattern nâng cao**425**Virtual ThreadsPreviewThread nhẹ, hỗ trợ xử lý hàng triệu task đồng thời**428**Structured ConcurrencyIncubatorAPI quản lý nhóm task song song**424**Foreign Function & Memory APIPreviewGọi native code + quản lý bộ nhớ an toàn**426**Vector APIIncubatorTăng tốc tính toán SIMD
+

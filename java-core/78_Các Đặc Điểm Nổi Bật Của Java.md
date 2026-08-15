@@ -1,33 +1,61 @@
-# Các Đặc Điểm Nổi Bật Của Java
+# Các Đặc Điểm Nổi Bật Của Java 22
 
-Ngày 18/03/2025, **Java 24** chính thức ra mắt. Đây **không phải bản LTS** (Long-Term Support), nhưng mang đến nhiều cải tiến quan trọng về hiệu suất, bảo mật và ngôn ngữ. Bản phát hành này gồm **24 JEPs** (JDK Enhancement Proposals), trong đó có tính năng permanent, preview, incubator và experimental.
+**Java 22** phát hành tháng 3/2024 mang đến nhiều cải tiến về cú pháp, hiệu năng và API. Đây là bản **non-LTS**, nhưng các tính năng mới của nó rất quan trọng cho những phiên bản LTS sau này.
 
-### **1\. Stream Gatherers (JEP 485)**
+### **1\. Statements Before** `super()` **trong Constructor (Preview)**
 
-Java 24 mở rộng `Stream` API với **Gatherers**, cho phép định nghĩa các thao tác trung gian tùy chỉnh.
-
-📌 Ví dụ: **Tạo gatherer nhóm phần tử theo cặp**
+*   Trước đây:
+    
 
 ```java
-import java.util.stream.*;
-import java.util.stream.Gatherers;
-
-public class App {
-    public static void main(String[] args) {
-        var result = Stream.of(1, 2, 3, 4, 5, 6)
-                .gather(Gatherers.windowFixed(2)) // gom thành cửa sổ 2 phần tử
-                .toList();
-
-        System.out.println(result); // [[1, 2], [3, 4], [5, 6]]
+class Parent {
+    Parent(String msg) {
+        System.out.println("Parent: " + msg);
     }
 }
 ```
 
-### **2\. Scoped Values (JEP 487 – Preview)**
+```java
+class Child extends Parent {
+    Child(String msg) {
+        super(msg); // bắt buộc phải gọi đầu tiên
+        System.out.println("Child: " + msg);
+    }
+}
+```
 
-Cho phép chia sẻ dữ liệu **bất biến** giữa các thread mà không cần `ThreadLocal`. Giúp code an toàn hơn, tránh lỗi rò rỉ dữ liệu khi dùng nhiều **thread** hoặc **virtual thread.**
+*   Java 22:
+    
 
-📌 Ví dụ:
+```java
+class Child extends Parent {
+    Child(String msg) {
+        System.out.println("Chuẩn bị khởi tạo...");
+        super(msg); // giờ có thể gọi sau
+        System.out.println("Child: " + msg);
+    }
+}
+```
+
+→ Giúp code **linh hoạt hơn** khi cần thực hiện logic trước khi gọi constructor cha.
+
+### **2\. String Templates (Preview – Lần 2)**
+
+```java
+String name = "Java";
+int version = 22;
+
+// Trước đây
+String oldWay = "Xin chào, " + name + " " + version;
+
+// Java 22
+String newWay = STR."Xin chào, \{name} \{version}";
+System.out.println(newWay); // Output: Xin chào, Java 22
+```
+
+→ Cú pháp ngắn gọn, **tránh rối rắm khi nối chuỗi** hoặc dùng `String.format()`.
+
+### **3\. Scoped Values (Preview – Lần 2)**
 
 ```java
 import jdk.incubator.concurrent.ScopedValue;
@@ -36,160 +64,115 @@ public class App {
     static final ScopedValue<String> USER = ScopedValue.newInstance();
 
     public static void main(String[] args) {
-        ScopedValue.where(USER, "TayJava")
-                   .run(() -> {
-                       System.out.println("Hello " + USER.get());
-                   });
+        ScopedValue.where(USER, "FoxDev").run(() -> {
+            System.out.println("Xin chào " + USER.get());
+        });
     }
 }
 ```
 
-### **3\. Flexible Constructor Bodies (JEP 492 – Preview)**
+→ Scoped Value chỉ tồn tại trong **phạm vi định nghĩa**, an toàn hơn **ThreadLocal** và tránh rò rỉ bộ nhớ.
 
-Constructor giờ có thể viết logic trước khi gọi `super(...)` hoặc `this(...)`. Giúp constructor linh hoạt, code rõ ràng hơn.
-
-📌 Ví dụ:
+### **4\. Structured Concurrency (Preview – Lần 2)**
 
 ```java
-class User {
-    String name;
-    int age;
-
-    User(String name, int age) {
-        System.out.println("Chuẩn bị khởi tạo user...");
-        this.name = name.trim(); // xử lý logic trước
-        this.age = Math.max(age, 0);
-    }
-}
-```
-
-```java
-public class App {
-    public static void main(String[] args) {
-        User u = new User("  Tây  ", -5);
-        System.out.println(u.name + " - " + u.age); // Tây - 0
-    }
-}
-```
-
-### **4\. Primitive Patterns (JEP 488 – Preview)**
-
-Cho phép pattern matching với **kiểu nguyên thủy** trong `switch` và `instanceof`. → Không cần boxing/unboxing, code ngắn gọn hơn.
-
-📌 Ví dụ:
-
-```java
-public class App {
-    
-    static void main(String[] args) {
-        System.out.println(check(42));     // Integer: 42
-        System.out.println(check(3.14));   // Double: 3.14
-    }
-
-    public static String check(Object obj) {
-        return switch (obj) {
-            case int i -> "Integer: " + i;
-            case double d -> "Double: " + d;
-            default -> "Khác";
-        };
-    }
-}
-```
-
-### **5\. Simple Source Files & Instance Main (JEP 495 – Preview)**
-
-Giờ bạn có thể viết chương trình Java **mà không cần class bao ngoài**. Rất hữu ích cho học tập, demo nhanh, hoặc script nhỏ.
-
-📌 Ví dụ: File `HelloWorld.java`
-
-```java
-void main() {
-    System.out.println("Xin chào Java 24!");
-}
-```
-
-– Chạy trực tiếp:
-
-```java
-java HelloWorld.java
-```
-
-### **6\. Key Derivation Function API (JEP 478 – Preview)**
-
-Java 24 giới thiệu API chuẩn để xử lý **Key Derivation Function** (PBKDF2, Argon2). Giúp tăng cường bảo mật, dễ dàng sử dụng API thay vì tự implement.
-
-📌 Ví dụ:
-
-```java
-import java.security.*;
-import java.security.spec.*;
+import java.util.concurrent.*;
+import jdk.incubator.concurrent.StructuredTaskScope;
 
 public class App {
     public static void main(String[] args) throws Exception {
-        var factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
-        var spec = new PBEKeySpec("mypassword".toCharArray(), "mysalt".getBytes(), 65536, 256);
-        var key = factory.generateSecret(spec).getEncoded();
+        try (var scope = new StructuredTaskScope.ShutdownOnFailure()) {
+            Future<String> f1 = scope.fork(() -> fetchUser());
+            Future<String> f2 = scope.fork(() -> fetchOrders());
+            
+            scope.join().throwIfFailed();
+            
+            System.out.println(f1.resultNow() + " - " + f2.resultNow());
+        }
+    }
 
-        System.out.println("Derived key length: " + key.length);
+    static String fetchUser() { return "User: FoxDev"; }
+    static String fetchOrders() { return "Orders: 5"; }
+}
+```
+
+→ Nếu một task lỗi, cả scope sẽ dừng, giúp code **dễ quản lý và an toàn hơn**.
+
+### **5\. Foreign Function & Memory API (Third Preview)**
+
+📌 Ví dụ gọi hàm C `strlen` từ Java:
+
+```java
+import java.lang.foreign.*;
+import java.lang.invoke.MethodHandle;
+
+public class App {
+    public static void main(String[] args) throws Throwable {
+        Linker linker = Linker.nativeLinker();
+        SymbolLookup stdlib = linker.defaultLookup();
+
+        MethodHandle strlen = linker.downcallHandle(
+            stdlib.find("strlen").get(),
+            FunctionDescriptor.of(ValueLayout.JAVA_LONG, ValueLayout.ADDRESS)
+        );
+
+        try (Arena arena = Arena.openConfined()) {
+            MemorySegment cString = arena.allocateUtf8String("Xin chào Java 22");
+            long length = (long) strlen.invoke(cString);
+            System.out.println("Độ dài chuỗi: " + length);
+        }
     }
 }
 ```
 
-### **7\. Vector API (JEP 489 – Incubator)**
+ Cho phép gọi **native code** dễ dàng, thay thế **JNI** phức tạp.
 
-Tiếp tục mở rộng, hỗ trợ SIMD cho tính toán hiệu năng cao. Giúp tăng tốc xử lý dữ liệu, ML, hình ảnh, khoa học.
+### **6\. Vector API (Seventh Incubator)**
 
-📌 Ví dụ: Tính tổng vector
+📌 Ví dụ cộng 2 mảng số nguyên bằng Vector API:
 
 ```java
 import jdk.incubator.vector.*;
 
 public class App {
     public static void main(String[] args) {
-        var species = IntVector.SPECIES_PREFERRED;
         int[] a = {1, 2, 3, 4};
-        int[] b = {10, 20, 30, 40};
-        int[] result = new int[4];
+        int[] b = {5, 6, 7, 8};
+        int[] c = new int[4];
 
+        var species = IntVector.SPECIES_PREFERRED;
         var va = IntVector.fromArray(species, a, 0);
         var vb = IntVector.fromArray(species, b, 0);
         var vc = va.add(vb);
-        vc.intoArray(result, 0);
+        vc.intoArray(c, 0);
 
-        System.out.println(java.util.Arrays.toString(result)); // [11, 22, 33, 44]
+        System.out.println(java.util.Arrays.toString(c)); // [6, 8, 10, 12]
     }
 }
 ```
 
-### **8\. Quantum-Resistant Cryptography (JEP 496 & 497)**
+Tận dụng CPU SIMD → **tăng tốc xử lý dữ liệu lớn**.
 
-Hỗ trợ thuật toán mã hóa khóa và chữ ký số chống lại tấn công **máy tính lượng tử**.  
-👉 Đây là bước quan trọng cho **cryptography tương lai** (ML-KEM, ML-DSA).
+### **7\. Cải Tiến Khác**
 
-### **9\. Compact Object Headers (JEP 450 – Experimental)**
-
-Giảm kích thước header của object → tiết kiệm bộ nhớ heap, cải thiện hiệu năng.  
-👉 Đặc biệt hữu ích cho ứng dụng chạy nhiều đối tượng nhỏ.
-
-### **10\. Các cải tiến khác**
-
-*   **AOT Class Loading (JEP 483):** Tăng tốc khởi động JVM.
+*   **Virtual Threads** tiếp tục được tối ưu → đơn giản hóa lập trình song song.
     
-*   **Loại bỏ Security Manager (JEP 486):** Dọn sạch API lỗi thời.
+*   **Pattern Matching** cho `switch` ổn định hơn:
     
-*   **ZGC chỉ còn generational mode (JEP 490).**
-    
-*   **Loại bỏ Windows 32-bit (JEP 479).**
+*   **Garbage Collection (GC)** nhanh hơn và tiêu tốn ít tài nguyên hơn.
     
 
-#### 🎯 Kết luận
+```java
+static String formatter(Object obj) {
+    return switch (obj) {
+        case Integer i -> "Số nguyên: " + i;
+        case String s -> "Chuỗi: " + s;
+        default -> "Khác";
+    };
+}
+```
 
-**Java 24** mang đến nhiều cải tiến từ hiệu năng, bảo mật, đến cú pháp ngôn ngữ:
+#### 📌 Kết Luận
 
-*   Stream Gatherers & Vector API giúp xử lý dữ liệu mạnh mẽ.
-    
-*   Scoped Values, Flexible Constructor, Primitive Patterns làm code dễ viết hơn.
-    
-*   Bảo mật nâng cao với Key Derivation API & Quantum-Resistant Crypto.
-    
-*   JVM tối ưu hơn với Compact Object Headers, AOT Loading, GC improvements.
+Java 22 mang đến nhiều tính năng **đột phá và thực tế** như String Templates, Scoped Values, Structured Concurrency và Foreign Function API. Đây là bước đệm cho các bản **LTS tiếp theo**.
+

@@ -4,7 +4,7 @@
 
 **PriorityQueue** là một lớp trong Java thuộc gói `java.util`. Nó đại diện cho một **hàng đợi ưu tiên** dựa trên **heap (cây nhị phân)**, trong đó các phần tử được xử lý theo mức độ ưu tiên thay vì thứ tự chèn vào (FIFO – First In First Out).
 
-![](https://cdn.tayjava.com/production/image/20250909_114754_pasted-1757393273540.png)
+![](../images/20250909_114754_pasted-1757393273540.png)
 
 ### **2\. Đặc điểm chính của** `PriorityQueue`
 
@@ -135,3 +135,5 @@ PriorityQueue sau khi xóa: [22, 11]
 *   **Hiệu suất tốt**:
     
     *   Khi cần một cấu trúc dữ liệu gọn nhẹ và nhanh để xử lý các phần tử theo thứ tự ưu tiên.
+        
+
