@@ -3,36 +3,20 @@
 ---
 
 ## 📑 Mục Lục
-- [1️⃣ Cách Đặt Tên Biến Chuẩn & Hằng Số trong Java](#1️⃣-cách-đặt-tên-biến-chuẩn--hằng-số-trong-java)
-  - [1.1 Quy tắc đặt tên biến chuẩn](#11-quy-tắc-đặt-tên-biến-chuẩn)
-  - [1.2 Hằng số (Constants)](#12-hằng-số-constants)
-- [2️⃣ Toán tử Tăng/Giảm phức tạp (++a, a++, --a, a--)](#2️⃣-toán-tử-tănggiảm-phức-tạp)
-  - [2.1 Toán tử 3 ngôi (Ternary Operator)](#21-toán-tử-3-ngôi)
-- [3️⃣ Cấu trúc rẽ nhánh `switch-case`](#3️⃣-cấu-trúc-rẽ-nhánh-switch-case)
-- [4️⃣ Các Cấu Trúc Vòng Lặp (Loops)](#4️⃣-các-cấu-trúc-vòng-lặp-loops)
-  - [4.1 Vòng lặp `for`](#41-vòng-lặp-for)
-  - [4.2 Vòng lặp `while`](#42-vòng-lặp-while)
-  - [4.3 Vòng lặp `do-while`](#43-vòng-lặp-do-while)
-  - [4.4 Vòng lặp lồng nhau (Nested Loops)](#44-vòng-lặp-lồng-nhau)
-- [5️⃣ Các Từ Khóa Điều Khiển Luồng: `break`, `continue`, `return`](#5️⃣-các-từ-khóa-điều-khiển-luồng)
-  - [5.1 Từ khóa `break`](#51-từ-khóa-break)
-  - [5.2 Từ khóa `continue`](#52-từ-khóa-continue)
-  - [5.3 Từ khóa `return`](#53-từ-khóa-return)
-  - [5.4 Labeled `break` và `continue`](#54-labeled-break-và-continue)
-- [6️⃣ Cách Viết Hàm (Phương Thức) Trong Java](#6️⃣-cách-viết-hàm-trong-java)
-- [7️⃣ Phạm Vi Của Biến (Variable Scope)](#7️⃣-phạm-vi-của-biến)
-- [📝 KHO BÀI TẬP THỰC HÀNH (62 Bài)](#-kho-bài-tập-thực-hành)
-  - [I. Bài Tập Tính Biểu Thức](#i-bài-tập-tính-biểu-thức)
-  - [II. Bài Tập `switch-case`](#ii-bài-tập-switch-case)
-  - [III. Bài Tập Vòng Lặp](#iii-bài-tập-vòng-lặp)
-  - [IV. Bài Toán Thực Tế](#iv-bài-toán-thực-tế)
-  - [V. Bài Tập Về Hàm & Từ Khóa](#v-bài-tập-về-hàm--từ-khóa)
-  - [VI. Bài Tập Nâng Cao](#vi-bài-tập-nâng-cao)
-- [🏆 VII. Bài Tập Cuối Tuần (Tổng Hợp)](#-vii-bài-tập-cuối-tuần)
-- [🎖️ VIII. FINAL BOSS - 3 Bài Tập Lớn (Mini-Projects)](#-viii-final-boss)
+- [1️⃣ Cách Đặt Tên Biến Chuẩn & Hằng Số trong Java](#part1)
+- [2️⃣ Toán tử Tăng/Giảm phức tạp (++a, a++, --a, a--)](#part2)
+- [3️⃣ Cấu trúc rẽ nhánh `switch-case`](#part3)
+- [4️⃣ Các Cấu Trúc Vòng Lặp (Loops)](#part4)
+- [5️⃣ Các Từ Khóa Điều Khiển Luồng: `break`, `continue`, `return`](#part5)
+- [6️⃣ Cách Viết Hàm (Phương Thức) Trong Java](#part6)
+- [7️⃣ Phạm Vi Của Biến (Variable Scope)](#part7)
+- [📝 KHO BÀI TẬP THỰC HÀNH (62 Bài)](#part8)
+- [🏆 VII. Bài Tập Cuối Tuần (Tổng Hợp)](#part9)
+- [🎖️ VIII. FINAL BOSS - 3 Bài Tập Lớn (Mini-Projects)](#part10)
 
 ---
 
+<a id="part1"></a>
 ## 1️⃣ Cách Đặt Tên Biến Chuẩn & Hằng Số trong Java
 
 ### 🏷️ 1.1 Quy tắc đặt tên biến chuẩn (Naming Convention)
@@ -61,6 +45,7 @@ final int MAX_USERS_PER_ROOM = 50;
 
 ---
 
+<a id="part2"></a>
 ## 2️⃣ Toán tử Tăng/Giảm phức tạp (++a, a++, --a, a--)
 
 Việc giải các bài toán dạng `int c = ++a + b-- - a++ + --b;` đòi hỏi chúng ta phải hiểu rõ sự khác biệt giữa **Tiền tố (Prefix)** và **Hậu tố (Postfix)**.
@@ -102,6 +87,7 @@ System.out.println(ketQua); // In ra: Đậu
 
 ---
 
+<a id="part3"></a>
 ## 3️⃣ Cấu trúc rẽ nhánh `switch-case`
 
 `switch-case` được dùng để thay thế chuỗi `if-else if` quá dài khi cần so sánh giá trị của 1 biến với nhiều trường hợp cụ thể bằng nhau.
@@ -129,6 +115,7 @@ switch (dayOfWeek) {
 
 ---
 
+<a id="part4"></a>
 ## 4️⃣ Các Cấu Trúc Vòng Lặp (Loops)
 
 Vòng lặp giúp chúng ta thực thi một đoạn code lặp đi lặp lại nhiều lần mà không phải viết lại code đó, giúp tiết kiệm thời gian và công sức. 
@@ -218,6 +205,7 @@ for (int i = 1; i <= 3; i++) { // Vòng lặp ngoài (quản lý số Dòng)
 
 ---
 
+<a id="part5"></a>
 ## 5️⃣ Các Từ Khóa Điều Khiển Luồng: `break`, `continue`, `return`
 
 Trong quá trình sử dụng vòng lặp hoặc hàm, bạn sẽ cần các từ khóa này để can thiệp vào luồng chạy của chương trình.
@@ -279,6 +267,7 @@ for (int i = 1; i <= 3; i++) {
 
 ---
 
+<a id="part6"></a>
 ## 6️⃣ Cách Viết Hàm (Phương Thức) Trong Java
 
 Hàm (trong Java gọi là Method) là một khối code dùng để thực hiện một tác vụ cụ thể. Việc dùng hàm giúp tái sử dụng code, làm code gọn gàng và dễ bảo trì hơn.
@@ -332,6 +321,7 @@ public static int calculateArea(int width, int height) {
 
 ---
 
+<a id="part7"></a>
 ## 7️⃣ Phạm Vi Của Biến (Variable Scope)
 
 Một quy tắc sống còn trong Java: **Biến được khai báo bên trong cặp ngoặc nhọn `{ }` nào thì chỉ có thể được sử dụng (sống) bên trong cặp ngoặc nhọn đó.**
@@ -359,6 +349,7 @@ public static void main(String[] args) {
 ---
 ---
 
+<a id="part8"></a>
 ## 📝 KHO BÀI TẬP THỰC HÀNH
 
 ### I. Bài Tập Tính Biểu Thức (Toán tử Tăng/Giảm)
@@ -522,6 +513,7 @@ public static void main(String[] args) {
 ---
 ---
 
+<a id="part9"></a>
 ## 🏆 VII. Bài Tập Cuối Tuần (Tổng Hợp Toàn Bộ Kiến Thức)
 
 Đây là 10 bài tập kết hợp **Toán tử, Switch-case, Vòng lặp, Nhãn (Label), Phạm vi biến, và Hàm**. Hãy cố gắng chia nhỏ logic ra thành các Hàm thay vì viết tất cả vào `main`.
@@ -544,6 +536,7 @@ public static void main(String[] args) {
 ---
 ---
 
+<a id="part10"></a>
 ## 🎖️ VIII. FINAL BOSS - 3 Bài Tập Lớn (Mini-Projects)
 
 Đây là 3 bài tập lớn (Mini-Projects). Mỗi bài yêu cầu bạn phải xây dựng một **Menu điều hướng** bằng `do-while` và `switch-case`, đồng thời tách toàn bộ logic tính toán ra thành các **Hàm (Methods)** riêng biệt. Cố gắng vận dụng mọi kiến thức từ Toán tử, Vòng lặp, Nhãn, Phạm vi biến cho đến `return` sớm.
