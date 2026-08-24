@@ -4,13 +4,30 @@
 
 ## 📑 Mục Lục
 - [1️⃣ Cách Đặt Tên Biến Chuẩn & Hằng Số trong Java](#part1)
+  - [1.1 Quy tắc đặt tên biến chuẩn](#part1_1)
+  - [1.2 Hằng số (Constants)](#part1_2)
 - [2️⃣ Toán tử Tăng/Giảm phức tạp (++a, a++, --a, a--)](#part2)
+  - [2.1 Toán tử 3 ngôi (Ternary Operator)](#part2_1)
 - [3️⃣ Cấu trúc rẽ nhánh `switch-case`](#part3)
 - [4️⃣ Các Cấu Trúc Vòng Lặp (Loops)](#part4)
+  - [4.1 Vòng lặp `for`](#part4_1)
+  - [4.2 Vòng lặp `while`](#part4_2)
+  - [4.3 Vòng lặp `do-while`](#part4_3)
+  - [4.4 Vòng lặp lồng nhau (Nested Loops)](#part4_4)
 - [5️⃣ Các Từ Khóa Điều Khiển Luồng: `break`, `continue`, `return`](#part5)
+  - [5.1 Từ khóa `break`](#part5_1)
+  - [5.2 Từ khóa `continue`](#part5_2)
+  - [5.3 Từ khóa `return`](#part5_3)
+  - [5.4 Labeled `break` và `continue`](#part5_4)
 - [6️⃣ Cách Viết Hàm (Phương Thức) Trong Java](#part6)
 - [7️⃣ Phạm Vi Của Biến (Variable Scope)](#part7)
 - [📝 KHO BÀI TẬP THỰC HÀNH (62 Bài)](#part8)
+  - [I. Bài Tập Tính Biểu Thức](#part8_1)
+  - [II. Bài Tập `switch-case`](#part8_2)
+  - [III. Bài Tập Vòng Lặp](#part8_3)
+  - [IV. Bài Toán Thực Tế](#part8_4)
+  - [V. Bài Tập Về Hàm & Từ Khóa](#part8_5)
+  - [VI. Bài Tập Nâng Cao](#part8_6)
 - [🏆 VII. Bài Tập Cuối Tuần (Tổng Hợp)](#part9)
 - [🎖️ VIII. FINAL BOSS - 3 Bài Tập Lớn (Mini-Projects)](#part10)
 
@@ -19,6 +36,7 @@
 <a id="part1"></a>
 ## 1️⃣ Cách Đặt Tên Biến Chuẩn & Hằng Số trong Java
 
+<a id="part1_1"></a>
 ### 🏷️ 1.1 Quy tắc đặt tên biến chuẩn (Naming Convention)
 Trong Java, chúng ta sử dụng **`camelCase`** (kiểu con lạc đà) để đặt tên biến và tên phương thức (method).
 - Bắt đầu bằng một chữ cái **viết thường**.
@@ -31,6 +49,7 @@ String firstName = "Nguyen";
 double accountBalance = 1500.50;
 ```
 
+<a id="part1_2"></a>
 ### 🔒 1.2 Hằng số (Constants)
 Hằng số là những biến mà giá trị của nó **không bao giờ thay đổi** sau khi được khởi tạo. 
 
@@ -72,6 +91,7 @@ int c = ++a + b-- - a++ + --b;
 
 **✅ Kết quả cuối cùng:** `a = 7`, `b = 6`, `c = 14`.
 
+<a id="part2_1"></a>
 ### 🔀 2.1 Toán tử 3 ngôi (Ternary Operator)
 Toán tử 3 ngôi là cách viết tắt cực kỳ ngắn gọn của cấu trúc `if-else`. Rất hay được dùng để gán giá trị cho biến dựa trên một điều kiện.
 
@@ -120,6 +140,7 @@ switch (dayOfWeek) {
 
 Vòng lặp giúp chúng ta thực thi một đoạn code lặp đi lặp lại nhiều lần mà không phải viết lại code đó, giúp tiết kiệm thời gian và công sức. 
 
+<a id="part4_1"></a>
 ### 🔄 4.1 Vòng lặp `for` (Biết trước số lần lặp)
 **Khái niệm:** Dùng khi bạn đã **biết chính xác số lần** mình muốn lặp lại một công việc.
 
@@ -143,6 +164,7 @@ for (int i = 1; i <= 5; i++) {
 // Giải thích: i bắt đầu từ 1. Miễn là i <= 5, in ra "Hello". Sau mỗi lần in, i tăng thêm 1 (i++).
 ```
 
+<a id="part4_2"></a>
 ### 🔁 4.2 Vòng lặp `while` (Chưa biết trước số lần lặp)
 **Khái niệm:** Dùng khi bạn **chưa biết sẽ phải lặp bao nhiêu lần**, nhưng bạn biết **điều kiện để dừng lại**. Vòng lặp này sẽ kiểm tra điều kiện **TRƯỚC**, nếu đúng thì mới chạy khối lệnh.
 
@@ -165,6 +187,7 @@ while (n > 0) { // Chừng nào n còn lớn hơn 0
 System.out.println("Số chữ số là: " + count); 
 ```
 
+<a id="part4_3"></a>
 ### 🔂 4.3 Vòng lặp `do-while` (Chạy trước, kiểm tra sau)
 **Khái niệm:** Hoàn toàn giống `while`, nhưng điểm khác biệt mấu chốt là nó kiểm tra điều kiện **SAU** khi đã chạy khối lệnh. 
 
@@ -185,6 +208,7 @@ do {
 System.out.println("Bạn đã nhập số hợp lệ: " + x);
 ```
 
+<a id="part4_4"></a>
 ### 🔄 4.4 Vòng lặp lồng nhau (Nested Loops)
 **Khái niệm:** Bạn hoàn toàn có thể đặt một vòng lặp bên trong một vòng lặp khác. Khi đó, với **mỗi 1 lần** vòng lặp ngoài chạy, vòng lặp bên trong sẽ phải **chạy hết toàn bộ vòng đời** của nó.
 
@@ -210,6 +234,7 @@ for (int i = 1; i <= 3; i++) { // Vòng lặp ngoài (quản lý số Dòng)
 
 Trong quá trình sử dụng vòng lặp hoặc hàm, bạn sẽ cần các từ khóa này để can thiệp vào luồng chạy của chương trình.
 
+<a id="part5_1"></a>
 ### 🛑 5.1 Từ khóa `break`
 **Tác dụng:** Dừng ngay lập tức toàn bộ vòng lặp (hoặc khối `switch-case`) chứa nó. Chương trình sẽ tiếp tục chạy các lệnh nằm sau vòng lặp đó.
 
@@ -223,6 +248,7 @@ for (int i = 1; i <= 10; i++) {
 // Kết quả in ra: 1 2 3 4
 ```
 
+<a id="part5_2"></a>
 ### ⏭️ 5.2 Từ khóa `continue`
 **Tác dụng:** Bỏ qua các câu lệnh còn lại trong **lần lặp hiện tại**, và nhảy thẳng sang lần lặp tiếp theo.
 
@@ -236,6 +262,7 @@ for (int i = 1; i <= 5; i++) {
 // Kết quả in ra: 1 2 4 5 (Không in ra 3)
 ```
 
+<a id="part5_3"></a>
 ### 🔙 5.3 Từ khóa `return`
 **Tác dụng:** Dừng ngay lập tức **toàn bộ hàm/phương thức** (method) hiện tại và trả về giá trị cho nơi đã gọi nó. Nếu dùng trong hàm `main`, nó sẽ kết thúc luôn chương trình.
 
@@ -249,6 +276,7 @@ public void checkAge(int age) {
 }
 ```
 
+<a id="part5_4"></a>
 ### 🏷️ 5.4 Labeled `break` và Labeled `continue` (Có nhãn)
 Khi làm việc với **Vòng lặp lồng nhau**, lệnh `break` hoặc `continue` bình thường chỉ có tác dụng với **vòng lặp gần nó nhất**. Nếu bạn muốn thoát thẳng ra khỏi vòng lặp cha (vòng lặp bên ngoài), bạn phải đặt "nhãn" (Label) cho vòng lặp cha.
 
@@ -352,6 +380,7 @@ public static void main(String[] args) {
 <a id="part8"></a>
 ## 📝 KHO BÀI TẬP THỰC HÀNH
 
+<a id="part8_1"></a>
 ### I. Bài Tập Tính Biểu Thức (Toán tử Tăng/Giảm)
 *Yêu cầu: Hãy tính nhẩm ra giấy giá trị cuối cùng của tất cả các biến trước khi viết code chạy thử.*
 
@@ -397,6 +426,7 @@ public static void main(String[] args) {
 
 ---
 
+<a id="part8_2"></a>
 ### II. Bài Tập `switch-case`
 1. **Bài 1:** Nhập vào tháng (1-12), in ra số ngày của tháng đó (Tháng 2 mặc định 28 ngày, không xét năm nhuận).
 2. **Bài 2:** Xây dựng một máy tính cơ bản. Nhập vào 2 số `a`, `b` và một ký tự toán tử (`+`, `-`, `*`, `/`). Dùng `switch` để tính và in ra kết quả tương ứng.
@@ -410,6 +440,7 @@ public static void main(String[] args) {
 
 ---
 
+<a id="part8_3"></a>
 ### III. Bài Tập Vòng Lặp (`for`, `while`, `do-while`)
 1. **Bài 1:** In ra các số từ 1 đến 100, nhưng các số chia hết cho 3 thì in "Fizz", chia hết cho 5 thì in "Buzz", chia hết cho cả 3 và 5 thì in "FizzBuzz".
 2. **Bài 2:** Nhập vào số nguyên dương `n`. Tính giai thừa của `n` (`n!`).
@@ -431,6 +462,7 @@ public static void main(String[] args) {
 
 ---
 
+<a id="part8_4"></a>
 ### IV. Bài Toán Thực Tế
 1. **Bài 1 (Tính tiền taxi):** 
    - 1 km đầu tiên: `15,000` VND.
@@ -462,6 +494,7 @@ public static void main(String[] args) {
 
 ---
 
+<a id="part8_5"></a>
 ### V. Bài Tập Về Hàm & Từ Khóa (`break`, `continue`, `return`)
 
 1. **Bài 1 (Dùng `break`):** Viết chương trình nhập liên tục các số nguyên từ bàn phím bằng vòng lặp vô hạn `while(true)`. Vòng lặp sẽ **dừng lại ngay lập tức** (dùng `break`) khi người dùng nhập vào số `0`. Cuối cùng in ra tổng các số đã nhập.
@@ -488,6 +521,7 @@ public static void main(String[] args) {
 
 ---
 
+<a id="part8_6"></a>
 ### VI. Bài Tập Nâng Cao (Toán tử 3 ngôi, Scope, Labeled Loop)
 
 1. **Bài 1 (Toán tử 3 ngôi):** Viết hàm `public static String checkPass(double score)` trả về `"Pass"` nếu `score >= 5.0` và `"Fail"` nếu `score < 5.0`. **Yêu cầu:** Chỉ dùng đúng 1 dòng code bên trong hàm bằng toán tử 3 ngôi, tuyệt đối không dùng `if-else`.
