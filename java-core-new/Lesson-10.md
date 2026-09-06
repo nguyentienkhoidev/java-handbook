@@ -31,7 +31,7 @@
   - [6.2 Truyền biến nguyên thủy (Primitive Type)](#62-truyền-biến-nguyên-thủy-primitive-type)
   - [6.3 Truyền biến đối tượng (Reference Type)](#63-truyền-biến-đối-tượng-reference-type)
   - [6.4 Hai thí nghiệm làm sáng tỏ bản chất](#64-hai-thí-nghiệm-làm-sáng-tỏ-bản-chất)
-- [📝 KHO 10 BÀI TẬP THỰC HÀNH (KHÔNG CÓ LỜI GIẢI)](#-kho-10-bài-tập-thực-hành-không-có-lời-giải)
+- [📝 KHO 10 BÀI TẬP THỰC HÀNH (CÓ LỜI GIẢI MẪU & BÀI TẬP TƯƠNG TỰ)](#-kho-10-bài-tập-thực-hành-có-lời-giải-mẫu--bài-tập-tương-tự)
 
 ---
 
@@ -471,14 +471,17 @@ public static void main(String[] args) {
 
 ---
 
-## 📝 KHO 10 BÀI TẬP THỰC HÀNH (KHÔNG CÓ LỜI GIẢI)
+## 📝 KHO 10 BÀI TẬP THỰC HÀNH (CÓ LỜI GIẢI MẪU & BÀI TẬP TƯƠNG TỰ)
 
-> **🎯 Hướng dẫn tự luyện:**  
-> Đọc kỹ các yêu cầu, tự thiết kế cấu trúc Class, Constructor và Method trên IDE. Tuyệt đối không xem đáp án trước khi tự viết code hoàn chỉnh và chạy thử đúng các Test Case mẫu.
+> **🎯 Phương pháp học tập hiệu quả:**  
+> 1. **Đọc kỹ đề bài & yêu cầu kỹ thuật** của từng bài tập.
+> 2. **Tự lập trình trên IDE** trước khi xem đáp án.
+> 3. Lời giải mẫu đã được **ẩn mặc định**. Bạn chỉ cần bấm vào nút **"💡 Xem lời giải mẫu hoàn chỉnh"** để đối chiếu mã nguồn và tư duy giải.
+> 4. Sau khi hiểu bài mẫu, hãy **tự tay giải bài tập tương tự** ngay bên dưới để khắc sâu kiến thức!
 
 ---
 
-### 🟢 CẤP ĐỘ 1: CƠ BẢN & NẮM VỮNG CÚ PHÁP
+### 🟢 CẤP ĐỘ 1: CƠ BẢN & NẮM VỮNG CÚ PHÁP (Bài 1 - Bài 3)
 
 #### 📌 Bài 1: Xây dựng Lớp Hình Tròn (`Circle`)
 - **Mục tiêu:** Thực hành viết Constructor có/không tham số, phương thức tính toán với số thực và hằng số `Math.PI`.
@@ -497,10 +500,70 @@ public static void main(String[] args) {
   [Hình tròn 2] Bán kính: 4.20 | Chu vi: 26.39 | Diện tích: 55.42
   ```
 
+<details>
+<summary><b>💡 Xem lời giải mẫu hoàn chỉnh (Click để mở)</b></summary>
+
+```java
+public class Circle {
+    // 1. Thuộc tính (State)
+    private double radius;
+
+    // 2. Constructor không tham số
+    public Circle() {
+        this.radius = 1.0;
+    }
+
+    // 3. Constructor có tham số (kèm validation)
+    public Circle(double radius) {
+        if (radius <= 0) {
+            System.out.println("Cảnh báo: Bán kính phải > 0. Gán mặc định về 1.0!");
+            this.radius = 1.0;
+        } else {
+            this.radius = radius;
+        }
+    }
+
+    // 4. Các phương thức tính toán (Behaviors)
+    public double calculateArea() {
+        return Math.PI * this.radius * this.radius;
+    }
+
+    public double calculatePerimeter() {
+        return 2 * Math.PI * this.radius;
+    }
+
+    public void displayInfo(String label) {
+        System.out.printf("[%s] Bán kính: %.2f | Chu vi: %.2f | Diện tích: %.2f\n",
+                label, this.radius, this.calculatePerimeter(), this.calculateArea());
+    }
+
+    public static void main(String[] args) {
+        Circle c1 = new Circle();
+        c1.displayInfo("Hình tròn 1");
+
+        Circle c2 = new Circle(4.2);
+        c2.displayInfo("Hình tròn 2");
+    }
+}
+```
+</details>
+
+##### 🎯 Bài tập tương tự tự luyện: Lớp Hình Vuông (`Square`)
+- **Yêu cầu:** Xây dựng Class `Square` với thuộc tính `side` (`double`).
+  - Constructor không tham số: mặc định gán cạnh $= 1.0$.
+  - Constructor có tham số `side` (nếu $\le 0$ thì gán mặc định $1.0$).
+  - Viết method `calculateArea()` ($S = \text{side}^2$), `calculatePerimeter()` ($P = \text{side} \times 4$), `displayInfo()`.
+  - Viết hàm `main` kiểm thử với hình vuông mặc định và hình vuông có cạnh $6.5$.
+- **Test Case kỳ vọng:**
+  ```text
+  [Hình vuông 1] Cạnh: 1.00 | Chu vi: 4.00 | Diện tích: 1.00
+  [Hình vuông 2] Cạnh: 6.50 | Chu vi: 26.00 | Diện tích: 42.25
+  ```
+
 ---
 
 #### 📌 Bài 2: Quản lý Điểm Sinh Viên (`Student`)
-- **Mục tiêu:** Khởi tạo đối tượng từ nhiều tham số kiểu dữ liệu khác nhau, viết method đánh giá logic rẽ nhánh.
+- **Mục tiêu:** Khởi tạo đối tượng từ nhiều tham số kiểu dữ liệu khác nhau, viết method đánh giá logic rẽ nhánh `if-else`.
 - **Yêu cầu kỹ thuật:**
   1. Class `Student` gồm các thuộc tính: `studentId` (`String`), `fullName` (`String`), `theoryScore` (`double`), `practiceScore` (`double`).
   2. Constructor:
@@ -520,6 +583,78 @@ public static void main(String[] args) {
   Mã SV: SV02 | Họ tên: Trần Thị Mai  | Điểm TB: 6.25 | Xếp loại: Trung Bình
   ```
 
+<details>
+<summary><b>💡 Xem lời giải mẫu hoàn chỉnh (Click để mở)</b></summary>
+
+```java
+public class Student {
+    private String studentId;
+    private String fullName;
+    private double theoryScore;
+    private double practiceScore;
+
+    // Constructor không tham số
+    public Student() {
+        this.studentId = "Chưa có";
+        this.fullName = "Chưa có";
+        this.theoryScore = 0.0;
+        this.practiceScore = 0.0;
+    }
+
+    // Constructor đầy đủ 4 tham số
+    public Student(String studentId, String fullName, double theoryScore, double practiceScore) {
+        this.studentId = studentId;
+        this.fullName = fullName;
+        this.theoryScore = theoryScore;
+        this.practiceScore = practiceScore;
+    }
+
+    // Tính điểm trung bình
+    public double calculateAverage() {
+        return (this.theoryScore + this.practiceScore) / 2.0;
+    }
+
+    // Xếp loại học lực
+    public String getRank() {
+        double avg = this.calculateAverage();
+        if (avg >= 8.0) return "Giỏi";
+        if (avg >= 6.5) return "Khá";
+        if (avg >= 5.0) return "Trung Bình";
+        return "Yếu";
+    }
+
+    // In thông tin chi tiết
+    public void printDetails() {
+        System.out.printf("Mã SV: %s | Họ tên: %-15s | Điểm TB: %.2f | Xếp loại: %s\n",
+                this.studentId, this.fullName, this.calculateAverage(), this.getRank());
+    }
+
+    public static void main(String[] args) {
+        Student s1 = new Student("SV01", "Nguyễn Văn An", 8.0, 8.5);
+        Student s2 = new Student("SV02", "Trần Thị Mai", 6.0, 6.5);
+
+        s1.printDetails();
+        s2.printDetails();
+    }
+}
+```
+</details>
+
+##### 🎯 Bài tập tương tự tự luyện: Lớp Sản Phẩm (`Product`)
+- **Yêu cầu:** Xây dựng Class `Product` với thuộc tính: `productId` (`String`), `productName` (`String`), `importPrice` (`double` - Giá nhập), `sellingPrice` (`double` - Giá bán).
+  - Constructor không tham số và Constructor 4 tham số.
+  - Method `calculateProfit()`: Lợi nhuận = $\text{sellingPrice} - \text{importPrice}$.
+  - Method `evaluateMargin()`: Trả về đánh giá:
+    - Nếu Lợi nhuận $> 500,000$ VND $\rightarrow$ `"Siêu Lợi Nhuận"`
+    - Nếu Lợi nhuận từ $100,000$ đến $500,000$ $\rightarrow$ `"Lợi Nhuận Tốt"`
+    - Nếu Lợi nhuận $> 0$ và $< 100,000$ $\rightarrow$ `"Lợi Nhuận Thấp"`
+    - Ngược lại $\rightarrow$ `"Hòa vốn hoặc Lỗ"`
+  - Method `printProduct()`: In mã hàng, tên, giá nhập, giá bán, lãi và đánh giá.
+- **Test Case kỳ vọng:**
+  ```text
+  Mã: SP01 | Tên: Tai nghe Bluetooth | Lãi: 200,000 VND | Đánh giá: Lợi Nhuận Tốt
+  ```
+
 ---
 
 #### 📌 Bài 3: Quản lý Thông Tin Sách (`Book`) & Khuyến Mãi
@@ -531,7 +666,7 @@ public static void main(String[] args) {
      - Constructor 2: Nhận `title`, `author`, `price`. Gán ngầm định `publishYear = 2026` bằng cách gọi `this(...)`.
      - Constructor 3: Không tham số. Gán tiêu đề `"Chưa rõ"`, giá bằng `0.0`, năm xuất bản `2026` bằng `this(...)`.
   3. Viết các method:
-     - `applyDiscount(double discountPercentage)`: Giảm trực tiếp thuộc tính `price` theo phần trăm truyền vào (ví dụ truyền 10 tức là giảm 10%). Nếu phần trăm giảm không nằm trong khoảng $[0, 100]$ thì không áp dụng.
+     - `applyDiscount(double discountPercentage)`: Giảm trực tiếp thuộc tính `price` theo phần trăm truyền vào (ví dụ truyền 20 tức là giảm 20%). Nếu phần trăm giảm không nằm trong khoảng $[0, 100]$ thì không áp dụng.
      - `display()`: In thông tin sách và giá hiện tại.
 - **Test Case mẫu:**
   ```text
@@ -540,11 +675,80 @@ public static void main(String[] args) {
   Giá sau giảm: 120,000 VND
   ```
 
+<details>
+<summary><b>💡 Xem lời giải mẫu hoàn chỉnh (Click để mở)</b></summary>
+
+```java
+public class Book {
+    private String title;
+    private String author;
+    private double price;
+    private int publishYear;
+
+    // 1. Constructor nòng cốt 4 tham số
+    public Book(String title, String author, double price, int publishYear) {
+        this.title = title;
+        this.author = author;
+        this.price = (price >= 0) ? price : 0.0;
+        this.publishYear = publishYear;
+    }
+
+    // 2. Constructor 3 tham số (mặc định xuất bản 2026)
+    public Book(String title, String author, double price) {
+        this(title, author, price, 2026); // Gọi Constructor 4 tham số
+    }
+
+    // 3. Constructor không tham số
+    public Book() {
+        this("Chưa rõ", "Vô danh", 0.0, 2026); // Tái sử dụng Constructor 4 tham số
+    }
+
+    // Giảm giá sách
+    public void applyDiscount(double discountPercentage) {
+        if (discountPercentage >= 0 && discountPercentage <= 100) {
+            double discountAmount = this.price * (discountPercentage / 100.0);
+            this.price -= discountAmount;
+            System.out.printf("Áp dụng giảm giá %.0f%% thành công!\n", discountPercentage);
+        } else {
+            System.out.println("Phần trăm giảm giá không hợp lệ (phải từ 0 đến 100)!");
+        }
+    }
+
+    public void display() {
+        System.out.printf("Sách: %s | Tác giả: %s | Năm XB: %d | Giá: %,.0f VND\n",
+                this.title, this.author, this.publishYear, this.price);
+    }
+
+    public static void main(String[] args) {
+        Book b = new Book("Lập trình Java Core", "Taylor", 150000);
+        b.display();
+
+        b.applyDiscount(20);
+        b.display();
+    }
+}
+```
+</details>
+
+##### 🎯 Bài tập tương tự tự luyện: Lớp Điện Thoại Thông Minh (`Smartphone`)
+- **Yêu cầu:** Class `Smartphone` gồm: `brand` (`String`), `model` (`String`), `price` (`double`), `storageGB` (`int`).
+  - Xây dựng Constructor 4 tham số.
+  - Xây dựng Constructor 3 tham số nhận `brand`, `model`, `price` (mặc định `storageGB = 128`) gọi chéo qua `this(...)`.
+  - Xây dựng Constructor không tham số gán mặc định qua `this(...)`.
+  - Method `upgradeStorage(int extraGB, double upgradeFee)`: Tăng dung lượng bộ nhớ thêm `extraGB` và cộng thêm `upgradeFee` vào giá tiền `price`.
+  - Method `display()`: In thông tin điện thoại.
+- **Test Case kỳ vọng:**
+  ```text
+  Khởi tạo: iPhone 15 | Apple | 128 GB | 20,000,000 VND
+  Nâng cấp thêm 128 GB (+ 3,000,000 VND)...
+  Sau nâng cấp: iPhone 15 | Apple | 256 GB | 23,000,000 VND
+  ```
+
 ---
 
-### 🟡 CẤP ĐỘ 2: KHÁ & THAO TÁC ĐỐI TƯỢNG
+### 🟡 CẤP ĐỘ 2: KHÁ & THAO TÁC ĐỐI TƯỢNG (Bài 4 - Bài 6)
 
-#### 📌 Bài 4: Mô Phỏng Tài Khoản Ngân Hàng (`BankAccount`)
+#### 📌 Bài 4: Mô Phỏng Tài Khoản Ngân Hàng (`BankAccount`) & Chuyển Tiền
 - **Mục tiêu:** Xử lý tương tác giữa 2 đối tượng độc lập qua tham số hàm (Pass-by-value tham chiếu).
 - **Yêu cầu kỹ thuật:**
   1. Class `BankAccount` gồm: `accountNumber` (`String`), `ownerName` (`String`), `balance` (`double`).
@@ -553,14 +757,105 @@ public static void main(String[] args) {
      - Có 3 tham số: số dư khởi tạo tối thiểu phải $\ge 50,000$ VND.
   3. Viết các method:
      - `deposit(double amount)`: Nạp thêm tiền (số tiền nạp phải $> 0$).
-     - `withdraw(double amount)`: Rút tiền. Điều kiện rút: `amount > 0` và `(balance - amount) >= 50000` (giữ lại số dư tối thiểu). Trả về `true` nếu thành công, `false` nếu thất bại.
-     - `transferTo(BankAccount targetAccount, double amount)`: Chuyển tiền sang tài khoản `targetAccount`. Nếu rút tiền từ tài khoản hiện tại thành công thì nạp số tiền đó vào `targetAccount` và trả về `true`.
+     - `withdraw(double amount)`: Rút tiền. Điều kiện: `amount > 0` và `(balance - amount) >= 50000` (duy trì số dư tối thiểu). Trả về `true` nếu thành công, `false` nếu thất bại.
+     - `transferTo(BankAccount targetAccount, double amount)`: Chuyển tiền sang tài khoản `targetAccount`. Nếu rút tiền từ tài khoản hiện tại thành công thì gọi tiếp `targetAccount.deposit(amount)` và trả về `true`.
 - **Test Case mẫu:**
   ```text
   Tài khoản A (Số dư: 200,000 VND) chuyển 100,000 VND sang Tài khoản B (Số dư: 50,000 VND).
   Kết quả chuyển tiền: Thành công!
   Số dư mới tài khoản A: 100,000 VND
   Số dư mới tài khoản B: 150,000 VND
+  ```
+
+<details>
+<summary><b>💡 Xem lời giải mẫu hoàn chỉnh (Click để mở)</b></summary>
+
+```java
+public class BankAccount {
+    private String accountNumber;
+    private String ownerName;
+    private double balance;
+
+    public BankAccount() {
+        this.accountNumber = "000000";
+        this.ownerName = "Khách vãng lai";
+        this.balance = 0.0;
+    }
+
+    public BankAccount(String accountNumber, String ownerName, double initialBalance) {
+        this.accountNumber = accountNumber;
+        this.ownerName = ownerName;
+        this.balance = (initialBalance >= 50000) ? initialBalance : 50000;
+    }
+
+    public void deposit(double amount) {
+        if (amount > 0) {
+            this.balance += amount;
+        } else {
+            System.out.println("Số tiền nạp phải lớn hơn 0!");
+        }
+    }
+
+    public boolean withdraw(double amount) {
+        if (amount > 0 && (this.balance - amount) >= 50000) {
+            this.balance -= amount;
+            return true;
+        }
+        return false;
+    }
+
+    // Phương thức tương tác giữa hai đối tượng độc lập
+    public boolean transferTo(BankAccount targetAccount, double amount) {
+        if (targetAccount == null) {
+            System.out.println("Tài khoản đích không tồn tại!");
+            return false;
+        }
+        if (this.withdraw(amount)) {
+            targetAccount.deposit(amount);
+            System.out.printf("Chuyển thành công %,.0f VND sang tài khoản %s!\n",
+                    amount, targetAccount.accountNumber);
+            return true;
+        } else {
+            System.out.println("Giao dịch chuyển tiền thất bại: Số dư không đủ!");
+            return false;
+        }
+    }
+
+    public void printBalance() {
+        System.out.printf("Tài khoản %s (%s) - Số dư: %,.0f VND\n",
+                this.accountNumber, this.ownerName, this.balance);
+    }
+
+    public static void main(String[] args) {
+        BankAccount accA = new BankAccount("1001", "Nguyễn Văn A", 200000);
+        BankAccount accB = new BankAccount("1002", "Trần Thị B", 50000);
+
+        accA.printBalance();
+        accB.printBalance();
+
+        System.out.println("\n--- Thực hiện chuyển tiền ---");
+        accA.transferTo(accB, 100000);
+
+        System.out.println("\n--- Số dư sau giao dịch ---");
+        accA.printBalance();
+        accB.printBalance();
+    }
+}
+```
+</details>
+
+##### 🎯 Bài tập tương tự tự luyện: Lớp Thẻ Điện Thoại SIM (`MobileSim`)
+- **Yêu cầu:** Class `MobileSim` gồm: `phoneNumber` (`String`), `carrier` (`String` - Viettel/Vina), `balance` (`double` - Tiền trong tài khoản).
+  - Constructor 3 tham số (số dư ban đầu $\ge 0$).
+  - Method `topUp(double amount)`: Nạp tiền thẻ cào vào tài khoản.
+  - Method `makeCall(int minutes)`: Trừ cước cuộc gọi với giá $1,500$ VND/phút. Nếu đủ tiền thì trừ và trả về `true`, ngược lại thông báo không đủ tiền và trả về `false`.
+  - Method `transferCredit(MobileSim receiverSim, double amount)`: Bắn tiền sang SIM khác (phí dịch vụ $1,000$ VND/lần chuyển do người gửi chịu). Trừ tiền người gửi và cộng cho người nhận nếu đủ số dư.
+- **Test Case kỳ vọng:**
+  ```text
+  Sim A (50,000 VND) bắn 20,000 VND cho Sim B (10,000 VND)
+  Phí chuyển: 1,000 VND
+  Số dư mới Sim A: 29,000 VND
+  Số dư mới Sim B: 30,000 VND
   ```
 
 ---
@@ -583,9 +878,75 @@ public static void main(String[] args) {
   Kết quả so sánh: Lê Văn Minh có thu nhập cao hơn Phạm Thu Hà.
   ```
 
+<details>
+<summary><b>💡 Xem lời giải mẫu hoàn chỉnh (Click để mở)</b></summary>
+
+```java
+public class Employee {
+    private String id;
+    private String name;
+    private double basicSalary;
+    private char rating;
+
+    public Employee(String id, String name, double basicSalary, char rating) {
+        this.id = id;
+        this.name = name;
+        this.basicSalary = (basicSalary >= 4500000) ? basicSalary : 4500000;
+        this.rating = rating;
+    }
+
+    public double calculateTotalSalary() {
+        switch (Character.toUpperCase(this.rating)) {
+            case 'A': return this.basicSalary * 1.2;
+            case 'B': return this.basicSalary * 1.1;
+            case 'C': return this.basicSalary * 1.0;
+            default:  return this.basicSalary;
+        }
+    }
+
+    // So sánh thu nhập giữa đối tượng hiện tại và đối tượng other
+    public void compareSalary(Employee other) {
+        if (other == null) return;
+        double salary1 = this.calculateTotalSalary();
+        double salary2 = other.calculateTotalSalary();
+
+        if (salary1 > salary2) {
+            System.out.printf("%s (%,.0f VND) có thu nhập cao hơn %s (%,.0f VND)\n",
+                    this.name, salary1, other.name, salary2);
+        } else if (salary1 < salary2) {
+            System.out.printf("%s (%,.0f VND) có thu nhập cao hơn %s (%,.0f VND)\n",
+                    other.name, salary2, this.name, salary1);
+        } else {
+            System.out.printf("Cả hai nhân viên %s và %s có thu nhập bằng nhau (%,.0f VND)\n",
+                    this.name, other.name, salary1);
+        }
+    }
+
+    public static void main(String[] args) {
+        Employee e1 = new Employee("NV01", "Lê Văn Minh", 10000000, 'A');
+        Employee e2 = new Employee("NV02", "Phạm Thu Hà", 10000000, 'B');
+
+        e1.compareSalary(e2);
+    }
+}
+```
+</details>
+
+##### 🎯 Bài tập tương tự tự luyện: Lớp Ô Tô (`Car`) & So Sánh Công Suất
+- **Yêu cầu:** Class `Car` gồm: `brand` (`String`), `modelName` (`String`), `horsepower` (`int` - Mã lực), `weight` (`double` - Tấn).
+  - Constructor 4 tham số có validation (nếu `horsepower <= 0` thì gán `100`).
+  - Method `calculatePowerToWeightRatio()`: Tính tỷ số công suất/trọng lượng = `horsepower / weight`.
+  - Method `comparePerformance(Car other)`: So sánh xem chiếc xe nào có tỷ số công suất/trọng lượng lớn hơn (chiếc xe đó có gia tốc tốt hơn) và in kết luận ra màn hình.
+- **Test Case kỳ vọng:**
+  ```text
+  Xe 1: Honda Civic (180 HP, 1.3 tấn) -> Tỷ số: 138.46 HP/tấn
+  Xe 2: Toyota Fortuner (200 HP, 2.1 tấn) -> Tỷ số: 95.24 HP/tấn
+  Kết luận: Honda Civic có khả năng tăng tốc vượt trội hơn Toyota Fortuner!
+  ```
+
 ---
 
-#### 📌 Bài 6: Bài Thí Nghiệm Bộ Nhớ Stack - Heap & Pass-By-Value
+#### 📌 Bài 6: Thí Nghiệm Bộ Nhớ Stack - Heap & Pass-By-Value
 - **Mục tiêu:** Kiểm tra tư duy bộ nhớ và giải thích cơ chế truyền giá trị thông qua mã nguồn thực tế.
 - **Yêu cầu kỹ thuật:**
   1. Sử dụng lại Class `Rectangle` (gồm 2 thuộc tính `length`, `width`).
@@ -595,14 +956,67 @@ public static void main(String[] args) {
      - `actionThree(Rectangle rect)`: Gán `rect = new Rectangle(50.0, 50.0);` và sau đó đổi `rect.length = 999.0;`.
   3. Trong hàm `main`:
      - Khai báo `int n = 5;` và `Rectangle r = new Rectangle(10.0, 5.0);`.
-     - Gọi `actionOne(n);` $\rightarrow$ In lại giá trị của `n`.
-     - Gọi `actionTwo(r);` $\rightarrow$ In lại giá trị của `r.length`.
-     - Gọi `actionThree(r);` $\rightarrow$ In lại giá trị của `r.length`.
-  4. **Yêu cầu tự trả lời:** Viết ghi chú (comment) giải thích chính xác tại sao `n` không đổi, tại sao sau `actionTwo` thì `length` đổi, và tại sao sau `actionThree` thì `length` không bị đổi thành 999.0.
+     - Gọi lần lượt 3 action và quan sát sự thay đổi giá trị.
+
+<details>
+<summary><b>💡 Xem lời giải mẫu hoàn chỉnh & Giải phẫu bộ nhớ (Click để mở)</b></summary>
+
+```java
+public class MemoryTest {
+    // Thí nghiệm 1: Kiểu nguyên thủy
+    public static void actionOne(int number) {
+        number = number + 10;
+        // number là bản sao cục bộ trên Stack Frame của actionOne
+    }
+
+    // Thí nghiệm 2: Thay đổi thuộc tính đối tượng
+    public static void actionTwo(Rectangle rect) {
+        rect.length = rect.length * 2;
+        // rect giữ bản sao địa chỉ của r, thay đổi trực tiếp thuộc tính trên Heap
+    }
+
+    // Thí nghiệm 3: Gán lại tham chiếu
+    public static void actionThree(Rectangle rect) {
+        rect = new Rectangle(50.0, 50.0); // rect trỏ sang ô nhớ hoàn toàn mới
+        rect.length = 999.0;              // Chỉ thay đổi thuộc tính của ô nhớ mới
+    }
+
+    public static void main(String[] args) {
+        int n = 5;
+        Rectangle r = new Rectangle(10.0, 5.0);
+
+        System.out.println("=== THÍ NGHIỆM 1: KIỂU NGUYÊN THỦY ===");
+        actionOne(n);
+        System.out.println("Giá trị n sau actionOne: " + n); 
+        // GIẢI THÍCH: n vẫn = 5. Do Java truyền tham trị, biến number nhận bản sao của 5.
+
+        System.out.println("\n=== THÍ NGHIỆM 2: SỬA THUỘC TÍNH OBJECT ===");
+        actionTwo(r);
+        System.out.println("Giá trị r.length sau actionTwo: " + r.length); 
+        // GIẢI THÍCH: r.length = 20.0. rect và r cùng giữ địa chỉ trỏ vào Object trên Heap.
+
+        System.out.println("\n=== THÍ NGHIỆM 3: GÁN NEW TRONG HÀM ===");
+        actionThree(r);
+        System.out.println("Giá trị r.length sau actionThree: " + r.length); 
+        // GIẢI THÍCH: r.length VẪN = 20.0. Biến r ở main vẫn trỏ vào Object cũ, 
+        // phép gán new chỉ làm đổi địa chỉ của biến cục bộ rect trong actionThree.
+    }
+}
+```
+</details>
+
+##### 🎯 Bài tập tương tự tự luyện: Lớp Tọa Độ (`Point`) & Thử Thách Hoán Đổi
+- **Yêu cầu:** Tạo class `Point` gồm 2 thuộc tính `public int x, y;` và Constructor nhận `(int x, int y)`.
+  - Trong class kiểm thử, viết 2 hàm:
+    - `public static void swap(Point p1, Point p2)`: Dùng biến tạm đổi `Point temp = p1; p1 = p2; p2 = temp;`.
+    - `public static void reset(Point p)`: Gán `p.x = 0; p.y = 0;`.
+  - Trong `main`, khởi tạo $P_1(3, 4)$ và $P_2(7, 8)$.
+  - Gọi `swap(p1, p2)` $\rightarrow$ Kiểm tra xem $P_1$ và $P_2$ có thực sự bị đổi chỗ cho nhau không? Giải thích vì sao.
+  - Gọi `reset(p1)` $\rightarrow$ Kiểm tra tọa độ của $P_1$ và giải thích vì sao.
 
 ---
 
-### 🟠 CẤP ĐỘ 3: NÂNG CAO & TƯ DUY TOÁN HỌC / THỜI GIAN
+### 🟠 CẤP ĐỘ 3: NÂNG CAO & TƯ DUY TOÁN HỌC / THỜI GIAN (Bài 7 - Bài 8)
 
 #### 📌 Bài 7: Xây dựng Lớp Phân Số (`Fraction`)
 - **Mục tiêu:** Thiết kế đối tượng có phương thức trả về một đối tượng mới (`return new ...`), giải thuật tìm ước chung lớn nhất (UCLN).
@@ -626,6 +1040,113 @@ public static void main(String[] args) {
   Nhân: 1/2 * 2/3 = 1/3
   ```
 
+<details>
+<summary><b>💡 Xem lời giải mẫu hoàn chỉnh (Click để mở)</b></summary>
+
+```java
+public class Fraction {
+    private int numerator;
+    private int denominator;
+
+    // Tìm ước số chung lớn nhất (GCD)
+    private int gcd(int a, int b) {
+        a = Math.abs(a);
+        b = Math.abs(b);
+        while (b != 0) {
+            int temp = b;
+            b = a % b;
+            a = temp;
+        }
+        return a;
+    }
+
+    // Tối giản phân số
+    private void simplify() {
+        int ucln = gcd(this.numerator, this.denominator);
+        this.numerator /= ucln;
+        this.denominator /= ucln;
+
+        // Chuẩn hóa dấu: mẫu luôn dương
+        if (this.denominator < 0) {
+            this.numerator = -this.numerator;
+            this.denominator = -this.denominator;
+        }
+    }
+
+    public Fraction(int numerator, int denominator) {
+        if (denominator == 0) {
+            System.out.println("Lỗi: Mẫu số không được bằng 0! Tự động gán mẫu số = 1.");
+            denominator = 1;
+        }
+        this.numerator = numerator;
+        this.denominator = denominator;
+        this.simplify(); // Tự động tối giản ngay khi sinh ra
+    }
+
+    public Fraction add(Fraction other) {
+        int newNum = this.numerator * other.denominator + other.numerator * this.denominator;
+        int newDenom = this.denominator * other.denominator;
+        return new Fraction(newNum, newDenom); // Trả về đối tượng mới
+    }
+
+    public Fraction subtract(Fraction other) {
+        int newNum = this.numerator * other.denominator - other.numerator * this.denominator;
+        int newDenom = this.denominator * other.denominator;
+        return new Fraction(newNum, newDenom);
+    }
+
+    public Fraction multiply(Fraction other) {
+        return new Fraction(this.numerator * other.numerator, this.denominator * other.denominator);
+    }
+
+    public Fraction divide(Fraction other) {
+        if (other.numerator == 0) {
+            System.out.println("Lỗi chia cho phân số 0! Trả về phân số mặc định 0/1.");
+            return new Fraction(0, 1);
+        }
+        return new Fraction(this.numerator * other.denominator, this.denominator * other.numerator);
+    }
+
+    public void print(String message) {
+        if (this.denominator == 1) {
+            System.out.printf("%s: %d\n", message, this.numerator);
+        } else {
+            System.out.printf("%s: %d/%d\n", message, this.numerator, this.denominator);
+        }
+    }
+
+    public static void main(String[] args) {
+        Fraction f1 = new Fraction(4, 8); // Tự rút gọn thành 1/2
+        Fraction f2 = new Fraction(2, 3);
+
+        f1.print("Phân số 1");
+        f2.print("Phân số 2");
+
+        Fraction sum = f1.add(f2);
+        sum.print("f1 + f2");
+
+        Fraction prod = f1.multiply(f2);
+        prod.print("f1 * f2");
+    }
+}
+```
+</details>
+
+##### 🎯 Bài tập tương tự tự luyện: Lớp Số Phức (`ComplexNumber`)
+- **Yêu cầu:** Một số phức có dạng $z = a + bi$ ($a$: phần thực, $b$: phần ảo).
+  - Tạo class `ComplexNumber` gồm: `real` (`double`), `imaginary` (`double`).
+  - Constructor không tham số ($0 + 0i$) và Constructor 2 tham số.
+  - Method `add(ComplexNumber other)`: Cộng 2 số phức: $(a_1 + a_2) + (b_1 + b_2)i \rightarrow$ trả về một `ComplexNumber` mới.
+  - Method `subtract(ComplexNumber other)`: Trừ 2 số phức $\rightarrow$ trả về một `ComplexNumber` mới.
+  - Method `multiply(ComplexNumber other)`: $(a_1a_2 - b_1b_2) + (a_1b_2 + a_2b_1)i \rightarrow$ trả về một `ComplexNumber` mới.
+  - Method `print()`: In định dạng `a + bi` (hoặc `a - bi`).
+- **Test Case kỳ vọng:**
+  ```text
+  z1 = 3.0 + 2.0i, z2 = 1.0 + 4.0i
+  z1 + z2 = 4.0 + 6.0i
+  z1 * z2 = -5.0 + 14.0i
+  ```
+
 ---
 
 #### 📌 Bài 8: Mô phỏng Đồng Hồ Thời Gian (`MyTime`)
@@ -647,9 +1168,103 @@ public static void main(String[] args) {
   Gọi previousSecond() -> 23:59:59
   ```
 
+<details>
+<summary><b>💡 Xem lời giải mẫu hoàn chỉnh (Click để mở)</b></summary>
+
+```java
+public class MyTime {
+    private int hour;
+    private int minute;
+    private int second;
+
+    public MyTime() {
+        this(0, 0, 0);
+    }
+
+    public MyTime(int hour, int minute, int second) {
+        this.hour = (hour >= 0 && hour < 24) ? hour : 0;
+        this.minute = (minute >= 0 && minute < 60) ? minute : 0;
+        this.second = (second >= 0 && second < 60) ? second : 0;
+    }
+
+    // Constructor quy đổi từ tổng số giây trong ngày
+    public MyTime(int totalSeconds) {
+        totalSeconds = totalSeconds % (24 * 3600); // Đảm bảo trong 1 ngày
+        if (totalSeconds < 0) totalSeconds += 24 * 3600;
+
+        this.hour = totalSeconds / 3600;
+        int remainder = totalSeconds % 3600;
+        this.minute = remainder / 60;
+        this.second = remainder % 60;
+    }
+
+    public void nextSecond() {
+        this.second++;
+        if (this.second >= 60) {
+            this.second = 0;
+            this.minute++;
+            if (this.minute >= 60) {
+                this.minute = 0;
+                this.hour++;
+                if (this.hour >= 24) {
+                    this.hour = 0;
+                }
+            }
+        }
+    }
+
+    public void previousSecond() {
+        this.second--;
+        if (this.second < 0) {
+            this.second = 59;
+            this.minute--;
+            if (this.minute < 0) {
+                this.minute = 59;
+                this.hour--;
+                if (this.hour < 0) {
+                    this.hour = 23;
+                }
+            }
+        }
+    }
+
+    public void display() {
+        System.out.printf("%02d:%02d:%02d\n", this.hour, this.minute, this.second);
+    }
+
+    public static void main(String[] args) {
+        MyTime t1 = new MyTime(23, 59, 58);
+        System.out.print("Khởi tạo: "); t1.display();
+
+        t1.nextSecond();
+        System.out.print("Tăng 1s  : "); t1.display();
+
+        t1.nextSecond();
+        System.out.print("Tăng 1s  : "); t1.display(); // Qua ngày mới 00:00:00
+
+        t1.previousSecond();
+        System.out.print("Lùi 1s   : "); t1.display(); // 23:59:59
+    }
+}
+```
+</details>
+
+##### 🎯 Bài tập tương tự tự luyện: Lớp Lịch Ngày Tháng Năm (`MyDate`)
+- **Yêu cầu:** Class `MyDate` gồm: `day`, `month`, `year`.
+  - Constructor nhận `(day, month, year)`.
+  - Hàm phụ trợ kiểm tra năm nhuận: `isLeapYear(int year)`.
+  - Hàm lấy số ngày tối đa trong tháng: tháng 1, 3, 5, 7, 8, 10, 12 có 31 ngày; tháng 4, 6, 9, 11 có 30 ngày; tháng 2 có 28 hoặc 29 ngày.
+  - Method `nextDay()`: Tăng lên 1 ngày tiếp theo (tự động điều chỉnh sang tháng mới hoặc sang năm mới).
+  - Method `display()`: In dạng `dd/MM/yyyy` (ví dụ: `31/12/2026` sang ngày mới thành `01/01/2027`).
+- **Test Case kỳ vọng:**
+  ```text
+  Ngày: 28/02/2024 (Năm nhuận) -> nextDay() -> 29/02/2024
+  Ngày: 31/12/2026 -> nextDay() -> 01/01/2027
+  ```
+
 ---
 
-### 🔴 CẤP ĐỘ 4: THỰC TẾ & KẾT HỢP NHIỀU ĐỐI TƯỢNG
+### 🔴 CẤP ĐỘ 4: THỰC TẾ & KẾT HỢP NHIỀU ĐỐI TƯỢNG (Bài 9 - Bài 10)
 
 #### 📌 Bài 9: Hệ Thống Giỏ Hàng Siêu Thị Mini (`CartItem` & `ShoppingCart`)
 - **Mục tiêu:** Tổ chức mối quan hệ giữa các đối tượng (Class chứa mảng các Class khác) và tính toán chiết khấu.
@@ -675,6 +1290,118 @@ public static void main(String[] args) {
   Tổng phụ: 70,000 VND
   Áp mã SALE10: Giảm 7,000 VND
   Phải thanh toán: 63,000 VND
+  ```
+
+<details>
+<summary><b>💡 Xem lời giải mẫu hoàn chỉnh (Click để mở)</b></summary>
+
+```java
+public class ShoppingCartDemo {
+
+    // 1. Lớp đại diện cho một món hàng trong giỏ
+    public static class CartItem {
+        private String itemName;
+        private double unitPrice;
+        private int quantity;
+
+        public CartItem(String itemName, double unitPrice, int quantity) {
+            this.itemName = itemName;
+            this.unitPrice = (unitPrice > 0) ? unitPrice : 0.0;
+            this.quantity = (quantity > 0) ? quantity : 1;
+        }
+
+        public double getSubtotal() {
+            return this.unitPrice * this.quantity;
+        }
+
+        public void printItem(int index) {
+            System.out.printf("%d. %-18s x %d = %,10.0f VND\n",
+                    index, this.itemName, this.quantity, this.getSubtotal());
+        }
+    }
+
+    // 2. Lớp giỏ hàng quản lý danh sách món hàng
+    public static class ShoppingCart {
+        private CartItem[] items;
+        private int count;
+
+        public ShoppingCart(int capacity) {
+            this.items = new CartItem[capacity];
+            this.count = 0;
+        }
+
+        public boolean addItem(CartItem item) {
+            if (this.count < this.items.length) {
+                this.items[this.count] = item;
+                this.count++;
+                return true;
+            }
+            System.out.println("Giỏ hàng đã đầy, không thể thêm!");
+            return false;
+        }
+
+        public double calculateTotal() {
+            double total = 0;
+            for (int i = 0; i < this.count; i++) {
+                total += this.items[i].getSubtotal();
+            }
+            return total;
+        }
+
+        public double calculateDiscount(String couponCode) {
+            double total = this.calculateTotal();
+            if ("SALE10".equalsIgnoreCase(couponCode)) {
+                double discount = total * 0.10;
+                return Math.min(discount, 50000); // Tối đa giảm 50,000 VND
+            } else if ("FREESHIP".equalsIgnoreCase(couponCode)) {
+                return 30000;
+            }
+            return 0.0;
+        }
+
+        public void printReceipt(String couponCode) {
+            System.out.println("================ HÓA ĐƠN MUA HÀNG ================");
+            for (int i = 0; i < this.count; i++) {
+                this.items[i].printItem(i + 1);
+            }
+            System.out.println("--------------------------------------------------");
+            double total = this.calculateTotal();
+            double discount = this.calculateDiscount(couponCode);
+            double finalPayment = Math.max(0, total - discount);
+
+            System.out.printf("Tổng tiền hàng  : %,12.0f VND\n", total);
+            if (discount > 0) {
+                System.out.printf("Mã giảm (%s): -%,11.0f VND\n", couponCode, discount);
+            }
+            System.out.printf("THANH TOÁN      : %,12.0f VND\n", finalPayment);
+            System.out.println("==================================================");
+        }
+    }
+
+    public static void main(String[] args) {
+        ShoppingCart cart = new ShoppingCart(5);
+        cart.addItem(new CartItem("Bánh mì bơ tỏi", 15000, 2));
+        cart.addItem(new CartItem("Cà phê sữa đá", 25000, 1));
+        cart.addItem(new CartItem("Snack khoai tây", 20000, 3));
+
+        cart.printReceipt("SALE10");
+    }
+}
+```
+</details>
+
+##### 🎯 Bài tập tương tự tự luyện: Quản Lý Lớp Học (`Classroom` & `Student`)
+- **Yêu cầu:** Kết hợp Class `Student` (đã làm ở Bài 2) và xây dựng Class `Classroom`:
+  - Fields của `Classroom`: `className` (`String`), mảng `Student[] students`, số sinh viên hiện có `size`.
+  - Constructor `Classroom(String className, int maxStudents)`.
+  - Method `addStudent(Student s)`: Thêm sinh viên vào lớp.
+  - Method `calculateClassAverage()`: Tính điểm trung bình của toàn thể sinh viên trong lớp.
+  - Method `findValedictorian()`: Tìm và in ra thông tin của Thủ khoa (sinh viên có điểm trung bình cao nhất lớp).
+- **Test Case kỳ vọng:**
+  ```text
+  Lớp: Java 01 (Sĩ số: 3 sinh viên)
+  Điểm trung bình lớp: 7.80
+  Thủ khoa của lớp: Nguyễn Văn An (Điểm TB: 9.20 - Xếp loại: Giỏi)
   ```
 
 ---
@@ -705,6 +1432,107 @@ public static void main(String[] args) {
   -> Giá vé: 130,000 VND
   -> Gọi book(): Đặt vé thành công!
   -> Gọi book() lần nữa: Lỗi: Ghế đã có người đặt!
+  ```
+
+<details>
+<summary><b>💡 Xem lời giải mẫu hoàn chỉnh (Click để mở)</b></summary>
+
+```java
+public class MovieTicket {
+    private String movieTitle;
+    private String seatCode;
+    private boolean isVip;
+    private boolean isWeekend;
+    private boolean isBooked;
+
+    // Constructor 1: 2 tham số
+    public MovieTicket(String movieTitle, String seatCode) {
+        this(movieTitle, seatCode, false);
+    }
+
+    // Constructor 2: 3 tham số
+    public MovieTicket(String movieTitle, String seatCode, boolean isWeekend) {
+        this.movieTitle = movieTitle;
+        this.seatCode = seatCode;
+        // Tự động nhận diện ghế VIP nếu mã ghế bắt đầu bằng VIP
+        this.isVip = (seatCode != null && seatCode.toUpperCase().startsWith("VIP"));
+        this.isWeekend = isWeekend;
+        this.isBooked = false; // Mặc định ban đầu vé chưa ai đặt
+    }
+
+    public double calculatePrice() {
+        double price = 80000; // Giá vé gốc
+        if (this.isWeekend) {
+            price += 20000;   // Phụ thu cuối tuần
+        }
+        if (this.isVip) {
+            price += 30000;   // Phụ thu ghế VIP
+        }
+        return price;
+    }
+
+    public boolean book() {
+        if (!this.isBooked) {
+            this.isBooked = true;
+            System.out.println("✅ Đặt vé thành công cho ghế: " + this.seatCode);
+            return true;
+        } else {
+            System.out.println("❌ Lỗi: Ghế " + this.seatCode + " đã có người đặt trước!");
+            return false;
+        }
+    }
+
+    public void cancel() {
+        if (this.isBooked) {
+            this.isBooked = false;
+            System.out.println("Đã hủy vé ghế: " + this.seatCode);
+        } else {
+            System.out.println("Vé chưa được đặt, không thể hủy!");
+        }
+    }
+
+    public void printTicketInfo() {
+        System.out.println("----------------------------------------------");
+        System.out.println("🎬 VÉ XEM PHIM: " + this.movieTitle);
+        System.out.printf("- Số ghế   : %s (%s)\n", this.seatCode, this.isVip ? "Ghế VIP" : "Ghế Thường");
+        System.out.printf("- Suất chiếu: %s\n", this.isWeekend ? "Cuối Tuần" : "Ngày Thường");
+        System.out.printf("- Giá vé   : %,.0f VND\n", this.calculatePrice());
+        System.out.printf("- Trạng thái: %s\n", this.isBooked ? "ĐÃ ĐƯỢC ĐẶT" : "CÒN TRỐNG");
+        System.out.println("----------------------------------------------");
+    }
+
+    public static void main(String[] args) {
+        MovieTicket t1 = new MovieTicket("Dune: Hành Tinh Cát", "VIP08", true);
+        t1.printTicketInfo();
+
+        // Thử đặt vé lần 1
+        t1.book();
+
+        // Cố tình đặt vé lần 2 trên cùng ghế
+        t1.book();
+
+        t1.printTicketInfo();
+    }
+}
+```
+</details>
+
+##### 🎯 Bài tập tương tự tự luyện: Quản Lý Đặt Phòng Khách Sạn (`HotelRoom`)
+- **Yêu cầu:** Class `HotelRoom` gồm:
+  - Fields: `roomNumber` (`String`), `roomType` (`String` - "STANDARD", "DELUXE", "VIP"), `isBooked` (`boolean`).
+  - Constructor nhận `roomNumber` và `roomType`. Mặc định `isBooked = false`.
+  - Method `getRoomRate()`:
+    - STANDARD: $400,000$ VND/đêm.
+    - DELUXE: $700,000$ VND/đêm.
+    - VIP: $1,200,000$ VND/đêm.
+  - Method `checkIn()`: Đổi `isBooked = true` (nếu phòng trống thì báo thành công, nếu đã có khách báo lỗi).
+  - Method `checkOut(int nights)`: Tính tiền phòng = `nights * getRoomRate()`, sau đó trả phòng (đổi `isBooked = false`).
+- **Test Case kỳ vọng:**
+  ```text
+  Phòng VIP 301:
+  - Khách check-in: Thành công!
+  - Khách ở 2 đêm, check-out: Tổng tiền = 2,400,000 VND
+  - Phòng trả về trạng thái TRỐNG.
   ```
 
 ---
