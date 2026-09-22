@@ -1,6 +1,6 @@
-# Lesson 15: Xử lý Chuỗi, Wrapper Class, Iterable và Xử lý Ngoại Lệ (Exception)
+# Lesson 15: Xử lý Chuỗi, Wrapper Class, Iterable, Exception và Generics
 
-Bài học này tổng hợp các kiến thức cực kỳ quan trọng và thường xuyên xuất hiện khi đi phỏng vấn Java Core. Chúng ta sẽ đi sâu vào bản chất của xử lý chuỗi (`String`, `StringBuilder`), cách cấu trúc Collection làm việc với `Wrapper Class` và `Iterable`, cũng như làm chủ hoàn toàn cơ chế Xử lý ngoại lệ (`Exception Handling`).
+Bài học này tổng hợp các kiến thức cực kỳ quan trọng và thường xuyên xuất hiện khi đi phỏng vấn Java Core. Chúng ta sẽ đi sâu vào bản chất của xử lý chuỗi (`String`, `StringBuilder`), cách cấu trúc Collection làm việc với `Wrapper Class`, `Iterable`, làm chủ hoàn toàn cơ chế Xử lý ngoại lệ (`Exception Handling`), và cuối cùng là sức mạnh của `Generics`.
 
 ## Mục lục
 - [1. String trong Java](#1-string-trong-java)
@@ -15,6 +15,11 @@ Bài học này tổng hợp các kiến thức cực kỳ quan trọng và thư
   - [6.4. Câu hỏi phỏng vấn "Kinh Điển": Phân biệt final, finally, và finalize](#64-câu-hỏi-phỏng-vấn-kinh-điển-phân-biệt-final-finally-và-finalize)
   - [6.5. Nâng cao: Khối lệnh Try-with-resources (Từ Java 7)](#65-nâng-cao-khối-lệnh-try-with-resources-từ-java-7)
   - [6.6. Nâng cao: Custom Exception (Tự định nghĩa Ngoại lệ)](#66-nâng-cao-custom-exception-tự-định-nghĩa-ngoại-lệ)
+- [7. Tổng quan về Generics trong Java](#7-tổng-quan-về-generics-trong-java)
+  - [7.1. Generics là gì và Tại sao cần nó?](#71-generics-là-gì-và-tại-sao-cần-nó)
+  - [7.2. Generic Class](#72-generic-class)
+  - [7.3. Generic Method](#73-generic-method)
+  - [7.4. Ký tự đại diện Wildcard (?)](#74-ký-tự-đại-diện-wildcard-)
 
 ---
 
@@ -483,10 +488,119 @@ public class BankAccount {
 }
 ```
 
+---
+
+## 7. Tổng quan về Generics trong Java
+
+### 7.1. Generics là gì và Tại sao cần nó?
+Ra mắt từ Java 5, **Generics** cho phép bạn truyền **Kiểu dữ liệu (Type)** như một tham số. Ký hiệu phổ biến nhất của Generics là cặp ngoặc nhọn `<T>` (với `T` viết tắt của Type).
+
+**Trước khi có Generics (Java 4 trở về trước):**
+Cấu trúc `ArrayList` lưu trữ mọi thứ dưới dạng `Object`. 
+```java
+ArrayList list = new ArrayList();
+list.add("Hello");
+list.add(123); // Cho phép nhét cả số (int) lẫn chữ (String) vào chung 1 list
+
+// Khi lấy ra bắt buộc phải ÉP KIỂU (Casting) thủ công:
+String s = (String) list.get(0); 
+String s2 = (String) list.get(1); // LỖI RUNTIME: ClassCastException (Do không thể ép số 123 thành String)
+```
+Việc này rất nguy hiểm vì lỗi ép kiểu sai chỉ bị phát hiện khi ứng dụng đang chạy (Runtime) làm crash app.
+
+**Từ khi có Generics (Java 5+):**
+```java
+ArrayList<String> list = new ArrayList<>();
+list.add("Hello");
+// list.add(123); // LỖI BIÊN DỊCH NGAY LẬP TỨC (Không cho phép nhét số vào list String)
+
+String s = list.get(0); // KHÔNG CẦN ÉP KIỂU nữa vì Java tự biết phần tử luôn là String
+```
+=> **Lợi ích cốt lõi của Generics:** 
+1. Cung cấp Type-Safety (An toàn kiểu dữ liệu) ngay lúc Compile, báo lỗi đỏ lập tức nếu truyền sai kiểu.
+2. Loại bỏ hoàn toàn việc phải ép kiểu (Casting) thủ công.
+
+### 7.2. Generic Class
+Bạn có thể tự tạo ra một Class có thể chứa được bất kỳ kiểu dữ liệu nào mà người dùng mong muốn:
+
+```java
+// T là một Type ngẫu nhiên sẽ được quyết định lúc khởi tạo
+class Box<T> {
+    private T item;
+
+    public void setItem(T item) {
+        this.item = item;
+    }
+
+    public T getItem() {
+        return item;
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        // Khởi tạo Box chứa String
+        Box<String> stringBox = new Box<>();
+        stringBox.setItem("Java Generics");
+        
+        // Khởi tạo Box chứa Số nguyên
+        Box<Integer> intBox = new Box<>();
+        intBox.setItem(99);
+    }
+}
+```
+*Các quy ước đặt tên (Convention) cho Type Parameter:*
+- `T` (Type): Dùng chung chung.
+- `E` (Element): Dùng nhiều trong Collection (như `ArrayList<E>`).
+- `K`, `V` (Key, Value): Dùng trong Map (như `HashMap<K, V>`).
+
+### 7.3. Generic Method
+Không chỉ Class, bạn có thể áp dụng Generics cho một phương thức (hàm) đơn lẻ, giúp hàm có thể xử lý đa dạng các mảng.
+
+```java
+public class Printer {
+    // Hàm này có thể in ra mảng của BẤT KỲ KIỂU DỮ LIỆU NÀO
+    // Ký hiệu <E> bắt buộc phải được đặt TRƯỚC kiểu trả về (void)
+    public static <E> void printArray(E[] array) {
+        for (E element : array) {
+            System.out.print(element + " ");
+        }
+        System.out.println();
+    }
+
+    public static void main(String[] args) {
+        Integer[] intArray = {1, 2, 3};
+        String[] strArray = {"A", "B", "C"};
+
+        printArray(intArray); // Output: 1 2 3
+        printArray(strArray); // Output: A B C
+    }
+}
+```
+
+### 7.4. Ký tự đại diện Wildcard (?)
+Trong Generics, dấu `?` tượng trưng cho "Bất kỳ kiểu nào" (Unknown Type).
+- `<?>`: Unbounded Wildcard (Kiểu nào cũng được). Vd: `ArrayList<?>`.
+- `<? extends T>`: Upper Bounded Wildcard (Chỉ chấp nhận class T hoặc các **class con** của T). Rất hay dùng để nới lỏng Generics một cách có kiểm soát.
+- `<? super T>`: Lower Bounded Wildcard (Chỉ chấp nhận class T hoặc các **class cha** của T).
+
+**Ví dụ về Bounded Wildcard:**
+```java
+// Hàm này chỉ nhận một Danh sách các con số (Integer, Double, Float...)
+// Nếu bạn truyền ArrayList<String> vào sẽ bị compiler gạch đỏ báo lỗi ngay.
+public static void printNumbers(List<? extends Number> list) {
+    for (Number n : list) {
+        System.out.println(n);
+    }
+}
+```
+
+---
+
 ### Tổng kết:
 - Xử lý chuỗi đơn giản, ít thay đổi -> Dùng `String`.
 - Nối, cắt, sửa chuỗi liên tục -> Dùng `StringBuilder`.
 - Nối mảng chuỗi với dấu phân cách -> Dùng `StringJoiner`.
-- Muốn tự tạo Class có thể dùng vòng lặp `for-each` để duyệt -> `implements Iterable`.
-- Muốn vừa lặp vừa xóa phần tử -> Dùng `Iterator`.
-- Collection chỉ chơi với Object, nên phải dùng **Wrapper Class** (Autoboxing/Unboxing xử lý việc chuyển đổi ngầm).
+- Tự tạo Class duyệt được bằng `for-each` -> `implements Iterable`.
+- Collection chỉ chơi với Object -> Dùng **Wrapper Class** (Tính năng Autoboxing/Unboxing xử lý ngầm).
+- Đảm bảo an toàn kiểu dữ liệu lúc compile, tránh lỗi ép kiểu (`ClassCastException`) -> Dùng **Generics `<T>`**.
