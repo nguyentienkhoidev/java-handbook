@@ -604,3 +604,67 @@ public static void printNumbers(List<? extends Number> list) {
 - Tự tạo Class duyệt được bằng `for-each` -> `implements Iterable`.
 - Collection chỉ chơi với Object -> Dùng **Wrapper Class** (Tính năng Autoboxing/Unboxing xử lý ngầm).
 - Đảm bảo an toàn kiểu dữ liệu lúc compile, tránh lỗi ép kiểu (`ClassCastException`) -> Dùng **Generics `<T>`**.
+
+---
+---
+
+## 📝 KHO BÀI TẬP THỰC HÀNH
+
+### I. Bài Tập Về String (Sử dụng tối đa các hàm của String)
+
+**Bài 1 (Khởi động với String): Phân tích chuỗi cơ bản**
+Cho một chuỗi văn bản: `String data = "   Java Core, Spring Boot, Hibernate, Microservices!  ";`
+Hãy thực hiện **lần lượt** các thao tác sau và in kết quả ra màn hình:
+1. Xóa khoảng trắng thừa ở 2 đầu chuỗi (dùng `trim()`).
+2. Kiểm tra xem chuỗi có trống hay rỗng không (dùng `isEmpty()` và `isBlank()`).
+3. Lấy độ dài của chuỗi sau khi đã trim (dùng `length()`).
+4. Chuyển toàn bộ chuỗi sang chữ HOA (dùng `toUpperCase()`).
+5. Chuyển toàn bộ chuỗi sang chữ thường (dùng `toLowerCase()`).
+6. Kiểm tra xem chuỗi có bắt đầu bằng chữ `"java"` (phân biệt hoa thường) và kết thúc bằng dấu `!` không? (dùng `startsWith()` và `endsWith()`).
+7. Lấy ký tự tại vị trí thứ 5 (dùng `charAt()`).
+
+**Bài 2 (Thao tác nâng cao với String): Tìm kiếm và Cắt ghép**
+Cho chuỗi: `String email = "nguyen.van.a@tayjava.vn";`
+1. Kiểm tra email có chứa chuỗi `"@tayjava"` hay không (dùng `contains()`).
+2. Tìm vị trí xuất hiện đầu tiên của ký tự `@` (dùng `indexOf()`).
+3. Cắt lấy phần "username" (phía trước `@`) và phần "domain" (phía sau `@`) (dùng `substring()`).
+4. Thay thế đuôi `.vn` thành `.com` (dùng `replace()`).
+5. Tách phần username `"nguyen.van.a"` thành một mảng các chuỗi, phân cách bởi dấu chấm `.` (dùng `split()`) và in ra từng phần tử.
+6. So sánh biến `email` với một email khác là `"NGUYEN.VAN.A@TAYJAVA.VN"` xem có giống nhau không (bỏ qua viết hoa/thường dùng `equalsIgnoreCase()`).
+
+### II. Bài Tập Về StringBuilder
+
+**Bài 3 (Xử lý chuỗi tốc độ cao): Tạo mã đơn hàng**
+Viết một hàm `public static String generateOrderCode(String prefix, int count)` để sinh ra một chuỗi mã đơn hàng ghép từ nhiều phần.
+- Khởi tạo một `StringBuilder` với giá trị là `prefix`.
+- Dùng vòng lặp `for` lặp `count` lần, mỗi lần nối thêm (dùng `append()`) một chuỗi là `"-ORD" + i`.
+- Sau khi vòng lặp kết thúc, hãy chèn chuỗi `"-[VIP]"` vào vị trí ngay sau `prefix` (dùng `insert()`).
+- Cuối cùng, trả về chuỗi hoàn chỉnh bằng `toString()`.
+
+**Bài 4 (Thuật toán chuỗi): Kiểm tra chuỗi Palindrome**
+Chuỗi Palindrome là chuỗi đọc xuôi hay đọc ngược đều giống nhau (Ví dụ: "madam", "racecar").
+- Viết một hàm `public static boolean isPalindrome(String text)`.
+- Bên trong hàm, tạo một `StringBuilder` từ chuỗi `text`.
+- Dùng hàm `reverse()` của `StringBuilder` để đảo ngược chuỗi.
+- Trả về kết quả so sánh chuỗi ban đầu với chuỗi đã đảo ngược (Gợi ý: Dùng `equals()`).
+
+### III. Bài Tập Về Exception (try-catch-finally)
+
+**Bài 5 (Bắt lỗi cơ bản): Máy tính an toàn**
+Viết hàm `public static void divide(int a, int b)`.
+- Trong hàm, thực hiện phép chia `a / b` và in ra kết quả.
+- Bọc phép chia trong khối `try-catch`. Bắt lỗi `ArithmeticException` (lỗi chia cho 0) và in ra câu thông báo: *"Lỗi: Không thể chia cho 0!"*.
+- Thêm khối `catch(Exception e)` ở dưới để bắt các lỗi không lường trước.
+- Ở khối `finally`, in ra dòng chữ: *"Kết thúc phép tính."*
+
+**Bài 6 (Bắt lỗi khi ép kiểu): Nhập số từ bàn phím**
+- Dùng `Scanner` để yêu cầu người dùng nhập vào một **chuỗi** thay vì nhập số (dùng `nextLine()`).
+- Dùng `Integer.parseInt(chuỗi)` để ép kiểu chuỗi vừa nhập thành một số nguyên.
+- Nếu người dùng nhập chữ (ví dụ: `"abc"`), Java sẽ ném ra lỗi `NumberFormatException`. Hãy bọc `try-catch` để bắt lỗi này và thông báo *"Bạn phải nhập một số hợp lệ!"*.
+
+**Bài 7 (Ném lỗi chủ động - `throw` và `throws`): Đăng ký tài khoản**
+- Viết một hàm `public static void registerUser(String username, String password) throws Exception`.
+- Trong hàm kiểm tra:
+  - Nếu `username` trống (`isEmpty()`), hãy dùng `throw` ném ra `Exception("Tên đăng nhập không được để trống!")`.
+  - Nếu `password.length() < 6`, hãy ném ra `Exception("Mật khẩu phải từ 6 ký tự trở lên!")`.
+- Trong hàm `main()`, gọi hàm `registerUser` và dùng `try-catch` để hứng lỗi, in message lỗi ra màn hình cho người dùng biết.
