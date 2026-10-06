@@ -1426,3 +1426,121 @@ public class GenericUtils {
 | **Stream API** | Lọc, biến đổi, gom nhóm dữ liệu từ Collection |
 | **Optional** | Tránh NullPointerException, xử lý giá trị có thể null |
 | **Generics + FP** | Tạo hàm/class đa năng, tái sử dụng cho mọi kiểu dữ liệu |
+
+---
+---
+
+# PHẦN 10: BÀI TẬP THỰC HÀNH TỔNG HỢP
+
+Để master các kiến thức đồ sộ trong bài học này, bạn cần thực hành rất nhiều. Dưới đây là danh sách bài tập cho từng chủ đề, từ cơ bản đến nâng cao.
+
+## 10.1. Bài tập Regex
+
+**Bài 1: Validate biển số xe máy Việt Nam**
+Viết chương trình kiểm tra biển số xe máy hợp lệ. 
+Ví dụ hợp lệ: `29-A1 123.45`, `30-K9 1234`.
+*Gợi ý: Bắt đầu bằng 2 chữ số, tiếp theo là 1 chữ cái và 1 chữ số, dấu cách, sau đó là 4 hoặc 5 chữ số (có thể có dấu chấm).*
+
+**Bài 2: Trích xuất các URL từ một đoạn văn bản HTML**
+Cho một chuỗi HTML chứa nhiều thẻ `<a>`. Hãy viết Regex để trích xuất toàn bộ các đường link (giá trị trong thuộc tính `href="..."`).
+*Ví dụ input:* `<a href="https://tayjava.vn">Trang chủ</a>` -> *Output:* `https://tayjava.vn`
+
+**Bài 3: Chuẩn hóa khoảng trắng trong chuỗi**
+Viết một hàm nhận vào một chuỗi, loại bỏ các khoảng trắng thừa (2 khoảng trắng liền nhau trở lên) và thay bằng 1 khoảng trắng duy nhất, đồng thời xóa khoảng trắng ở đầu và cuối chuỗi. Không dùng hàm `trim()`.
+
+**Bài 4: Tìm từ lặp lại trong câu**
+Dùng Backreference (Tham chiếu ngược) để tìm và in ra các từ bị gõ lặp liên tiếp trong câu.
+*Ví dụ:* "Tôi đi học học bài và làm làm bài tập" -> Bắt được "học học", "làm làm".
+
+**Bài 5: Validate Password Mạnh (Lookahead)**
+Viết Regex kiểm tra password thỏa mãn:
+- Ít nhất 8 ký tự.
+- Chứa ít nhất 1 chữ hoa, 1 chữ thường, 1 số, 1 ký tự đặc biệt (`@, $, !, %, *, ?, &`).
+
+---
+
+## 10.2. Bài tập Date Time API
+
+**Bài 1: Tính số ngày còn lại đến sinh nhật**
+Nhập vào ngày sinh của bạn. Tính xem từ hôm nay (`LocalDate.now()`) đến sinh nhật tiếp theo của bạn còn bao nhiêu ngày.
+
+**Bài 2: Máy tính hạn sử dụng thẻ tín dụng**
+Viết chương trình nhận vào ngày phát hành thẻ (VD: "10/2026"). Thẻ có hạn 3 năm. Hãy in ra ngày cuối cùng của tháng hết hạn. (Gợi ý: Dùng `YearMonth` và `TemporalAdjusters.lastDayOfMonth()`).
+
+**Bài 3: Chuyển đổi múi giờ cho hệ thống Meeting**
+Bạn tạo một lịch họp lúc `15:00` giờ Việt Nam (`Asia/Ho_Chi_Minh`). Đối tác của bạn ở Tokyo (`Asia/Tokyo`) và New York (`America/New_York`). Hãy in ra giờ họp tương ứng trên máy tính của đối tác.
+
+**Bài 4: Tính số ngày làm việc (Trừ T7, CN)**
+Viết một hàm nhận vào 2 đối tượng `LocalDate` (start và end). Trả về tổng số ngày làm việc giữa 2 khoảng thời gian này (không tính thứ 7 và Chủ Nhật).
+
+**Bài 5: Log Parser Timestamp**
+Cho một file log chứa các dòng bắt đầu bằng thời gian chuẩn ISO: `2026-10-06T14:30:45.123Z [ERROR] Database timeout`. Viết chương trình đọc chuỗi thời gian trên, parse thành `Instant`, sau đó chuyển thành `LocalDateTime` hiển thị theo định dạng `dd/MM/yyyy HH:mm:ss` (múi giờ mặc định của hệ thống).
+
+---
+
+## 10.3. Bài tập Lambda, Functional Interface & Method Reference
+
+**Bài 1: Filter Custom bằng Predicate**
+Tự định nghĩa một phương thức `public static <T> List<T> myFilter(List<T> list, Predicate<T> predicate)`. 
+Sử dụng hàm này để:
+- Lọc ra các số nguyên tố từ một `List<Integer>`.
+- Lọc ra các sinh viên có điểm > 8.0 từ một `List<Student>`.
+
+**Bài 2: Tính toán động bằng Function & BiFunction**
+Viết một hệ thống tính lương đơn giản.
+- Dùng `Function<Double, Double>` để tính thuế thu nhập (ví dụ 10%).
+- Dùng `BiFunction<Double, Integer, Double>` để tính tổng lương = Lương cơ bản * Hệ số - Thuế.
+
+**Bài 3: Pipeline xử lý String với UnaryOperator**
+Cho một `List<UnaryOperator<String>>` chứa các bước xử lý chuỗi: Xóa khoảng trắng 2 đầu -> Viết hoa toàn bộ -> Thay thế "JAVA" thành "JAVA 8+". 
+Viết chương trình duyệt qua List này và áp dụng tuần tự các thao tác lên một chuỗi input.
+
+**Bài 4: Chuyển đổi Collection bằng Method Reference**
+Cho một `List<String>` chứa các chuỗi số (VD: `["1", "2", "3"]`). Dùng Method Reference của `Integer` để biến đổi List này thành `List<Integer>`.
+
+**Bài 5: Consumer và Supplier kết hợp**
+Viết hàm `processWithLog(Supplier<String> dataSupplier, Consumer<String> dataConsumer)`. Hàm này sẽ lấy dữ liệu từ Supplier, in ra dòng log "Đang xử lý dữ liệu...", sau đó đưa dữ liệu vào Consumer để xử lý.
+
+---
+
+## 10.4. Bài tập Stream API
+
+**Bài 1: Xử lý danh sách Sản phẩm (Product)**
+Cho `List<Product>` (id, name, price, category).
+- Lọc ra các sản phẩm thuộc category "Laptop" có giá > 15 triệu.
+- Sắp xếp kết quả theo giá giảm dần.
+- Lấy ra tên của 3 sản phẩm đầu tiên và nối thành chuỗi, cách nhau bởi dấu phẩy.
+
+**Bài 2: Gom nhóm (GroupingBy) Đơn hàng**
+Cho `List<Order>` (orderId, customerName, totalAmount, status).
+- Gom nhóm các đơn hàng theo `status` (PENDING, COMPLETED, CANCELLED).
+- Tính tổng tiền của tất cả các đơn hàng COMPLETED.
+
+**Bài 3: Thống kê Điểm Sinh Viên (IntSummaryStatistics)**
+Cho mảng điểm `int[] scores = {5, 7, 8, 9, 4, 10, 6}`. Dùng Stream để tìm Điểm cao nhất, Điểm thấp nhất, và Điểm trung bình trong một lần chạy duy nhất.
+
+**Bài 4: Tìm hiểu flatMap**
+Cho một `List<Department>`, mỗi `Department` chứa một `List<Employee>`. Sử dụng `flatMap` để tạo ra một danh sách chứa TẤT CẢ các Employee trong công ty, sau đó lọc ra những người có số năm kinh nghiệm > 5.
+
+**Bài 5: Chữ cái xuất hiện nhiều nhất**
+Cho một chuỗi văn bản dài. Dùng Stream biến đổi chuỗi thành danh sách các ký tự, lọc bỏ khoảng trắng, gom nhóm để đếm tần suất mỗi ký tự, và tìm ra ký tự xuất hiện nhiều nhất.
+
+---
+
+## 10.5. Bài tập Optional
+
+**Bài 1: Tránh NPE cơ bản**
+Viết hàm `public Optional<User> findUserById(int id)` giả lập tìm user trong DB. Nếu id = 1 thì trả về User(id=1, name="Khoi"), ngược lại rỗng. Trong hàm `main`, gọi hàm trên, in ra tên user nếu tìm thấy, nếu không in ra "User not found" (Dùng Optional API, cấm dùng if-else).
+
+**Bài 2: Optional trong Object lồng nhau**
+Cho các class `Company` -> chứa `Department` -> chứa `Manager` -> chứa `String name`. (Tất cả đều dùng getter có thể trả về null).
+Viết hàm lấy tên Manager của một Company truyền vào. Dùng Optional `map` và `flatMap` để xử lý chuỗi này, nếu bất kỳ bước nào null, trả về "No Manager".
+
+**Bài 3: Xử lý giá trị Default bằng orElseGet**
+Giả sử hàm lấy cấu hình từ database `getConfigFromDb()` rất chậm. Viết logic: Thử lấy cấu hình bằng biến môi trường (Environment Variable), bọc trong Optional. Nếu rỗng, dùng `orElseGet` để gọi hàm `getConfigFromDb()`.
+
+**Bài 4: Ném Exception với Optional**
+Lấy một chuỗi số lượng sản phẩm từ API (có thể null). Bọc vào Optional. Biến đổi (map) chuỗi đó thành Integer. Nếu chuỗi rỗng hoặc lỗi, ném ra ngoại lệ `IllegalArgumentException("Invalid quantity")` bằng `orElseThrow`.
+
+**Bài 5: Kết hợp Stream và Optional**
+Cho `List<Optional<String>>` chứa nhiều email (có cái có, có cái rỗng). Viết Stream để bóc tất cả các Optional có giá trị ra, nối chúng thành một chuỗi duy nhất cách nhau bởi dấu chấm phẩy `;`. Dùng hàm `flatMap(Optional::stream)` (có từ Java 9).
