@@ -12,6 +12,7 @@ Bài học này là một trong những bài học **đồ sộ và quan trọng
 - [PHẦN 7: Stream API](#phần-7-stream-api)
 - [PHẦN 8: Optional](#phần-8-optional)
 - [PHẦN 9: Generics trong Functional Programming](#phần-9-generics-trong-functional-programming)
+- [PHẦN 10: Bài tập thực hành tổng hợp](#phần-10-bài-tập-thực-hành-tổng-hợp)
 
 ---
 ---
@@ -1461,86 +1462,1346 @@ Viết Regex kiểm tra password thỏa mãn:
 
 ## 10.2. Bài tập Date Time API
 
-**Bài 1: Tính số ngày còn lại đến sinh nhật**
-Nhập vào ngày sinh của bạn. Tính xem từ hôm nay (`LocalDate.now()`) đến sinh nhật tiếp theo của bạn còn bao nhiêu ngày.
+### 📌 Bài 1: Tính số ngày còn lại đến sinh nhật
+- **Mục tiêu:** Sử dụng `LocalDate`, `ChronoUnit.DAYS.between()`, xử lý cộng/đổi năm và trường hợp đặc biệt (năm nhuận ngày 29/02).
+- **Yêu cầu kỹ thuật:**
+  - Nhập vào ngày sinh của bạn (`LocalDate birthDate`).
+  - Lấy ngày hôm nay qua `LocalDate.now()`.
+  - Xác định ngày sinh nhật kế tiếp:
+    - Nếu sinh nhật trong năm nay chưa diễn ra, lấy sinh nhật năm nay.
+    - Nếu sinh nhật năm nay đã trôi qua hoặc là hôm nay, chuyển sang sinh nhật năm tiếp theo (`plusYears(1)`).
+  - Tính và in ra số ngày còn lại đến sinh nhật tiếp theo.
 
-**Bài 2: Máy tính hạn sử dụng thẻ tín dụng**
-Viết chương trình nhận vào ngày phát hành thẻ (VD: "10/2026"). Thẻ có hạn 3 năm. Hãy in ra ngày cuối cùng của tháng hết hạn. (Gợi ý: Dùng `YearMonth` và `TemporalAdjusters.lastDayOfMonth()`).
+<details>
+<summary><b>💡 Xem lời giải mẫu hoàn chỉnh (Click để mở)</b></summary>
 
-**Bài 3: Chuyển đổi múi giờ cho hệ thống Meeting**
-Bạn tạo một lịch họp lúc `15:00` giờ Việt Nam (`Asia/Ho_Chi_Minh`). Đối tác của bạn ở Tokyo (`Asia/Tokyo`) và New York (`America/New_York`). Hãy in ra giờ họp tương ứng trên máy tính của đối tác.
+```java
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 
-**Bài 4: Tính số ngày làm việc (Trừ T7, CN)**
-Viết một hàm nhận vào 2 đối tượng `LocalDate` (start và end). Trả về tổng số ngày làm việc giữa 2 khoảng thời gian này (không tính thứ 7 và Chủ Nhật).
+public class BirthdayCountdownDemo {
+    public static void main(String[] args) {
+        // Giả sử ngày sinh: 20/11/2000
+        LocalDate birthDate = LocalDate.of(2000, 11, 20);
+        LocalDate today = LocalDate.now();
 
-**Bài 5: Log Parser Timestamp**
-Cho một file log chứa các dòng bắt đầu bằng thời gian chuẩn ISO: `2026-10-06T14:30:45.123Z [ERROR] Database timeout`. Viết chương trình đọc chuỗi thời gian trên, parse thành `Instant`, sau đó chuyển thành `LocalDateTime` hiển thị theo định dạng `dd/MM/yyyy HH:mm:ss` (múi giờ mặc định của hệ thống).
+        System.out.println("Hôm nay là: " + today);
+        System.out.println("Ngày sinh : " + birthDate);
+
+        // 1. Gán năm hiện tại vào ngày sinh
+        LocalDate nextBirthday = birthDate.withYear(today.getYear());
+
+        // 2. Nếu sinh nhật năm nay đã qua hoặc là hôm nay -> tính sinh nhật năm sau
+        if (nextBirthday.isBefore(today) || nextBirthday.isEqual(today)) {
+            nextBirthday = nextBirthday.plusYears(1);
+        }
+
+        // 3. Tính khoảng cách số ngày
+        long daysRemaining = ChronoUnit.DAYS.between(today, nextBirthday);
+
+        System.out.println("Sinh nhật kế tiếp rơi vào: " + nextBirthday);
+        System.out.println("Số ngày còn lại đến sinh nhật: " + daysRemaining + " ngày");
+    }
+}
+```
+
+**Output mẫu:**
+```text
+Hôm nay là: 2026-10-08
+Ngày sinh : 2000-11-20
+Sinh nhật kế tiếp rơi vào: 2026-11-20
+Số ngày còn lại đến sinh nhật: 43 ngày
+```
+
+**Giải thích chi tiết:**
+- `birthDate.withYear(today.getYear())`: Tạo ra đối tượng `LocalDate` mới giữ nguyên ngày/tháng và thay bằng năm hiện tại.
+- **Xử lý năm nhuận 29/02:** Nếu một người sinh vào `2004-02-29`, khi sang năm không nhuận (như 2026), `withYear()` trong Java tự động lùi về ngày `2026-02-28` hợp lệ mà không quăng lỗi `DateTimeException`.
+- `ChronoUnit.DAYS.between(today, nextBirthday)`: Đo lường chính xác số ngày giữa 2 mốc thời gian.
+</details>
+
+---
+
+### 📌 Bài 2: Máy tính hạn sử dụng thẻ tín dụng
+- **Mục tiêu:** Thao tác với `YearMonth`, `DateTimeFormatter`, và bộ điều chỉnh thời gian `TemporalAdjusters.lastDayOfMonth()`.
+- **Yêu cầu kỹ thuật:**
+  - Nhận vào chuỗi tháng/năm phát hành thẻ (VD: `"10/2026"`).
+  - Parse chuỗi thành `YearMonth`.
+  - Thẻ có hạn 3 năm (`plusYears(3)`).
+  - In ra ngày cuối cùng của tháng hết hạn theo định dạng `dd/MM/yyyy`.
+
+<details>
+<summary><b>💡 Xem lời giải mẫu hoàn chỉnh (Click để mở)</b></summary>
+
+```java
+import java.time.LocalDate;
+import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAdjusters;
+
+public class CreditCardExpiryDemo {
+    public static void main(String[] args) {
+        String issuedDateStr = "10/2026";
+        DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("MM/yyyy");
+
+        // 1. Parse chuỗi thành YearMonth
+        YearMonth issuedYearMonth = YearMonth.parse(issuedDateStr, inputFormatter);
+
+        // 2. Thẻ có thời hạn 3 năm
+        YearMonth expiryYearMonth = issuedYearMonth.plusYears(3);
+
+        // 3. Cách 1: Sử dụng trực tiếp atEndOfMonth() của YearMonth
+        LocalDate expiryDate = expiryYearMonth.atEndOfMonth();
+
+        // Hoặc Cách 2: Thông qua TemporalAdjusters
+        // LocalDate expiryDate = expiryYearMonth.atDay(1).with(TemporalAdjusters.lastDayOfMonth());
+
+        DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        System.out.println("Tháng phát hành    : " + issuedDateStr);
+        System.out.println("Tháng hết hạn thẻ  : " + expiryYearMonth.format(inputFormatter));
+        System.out.println("Ngày hết hạn cuối  : " + expiryDate.format(outputFormatter));
+    }
+}
+```
+
+**Output mẫu:**
+```text
+Tháng phát hành    : 10/2026
+Tháng hết hạn thẻ  : 10/2029
+Ngày hết hạn cuối  : 31/10/2029
+```
+
+**Giải thích chi tiết:**
+- `YearMonth`: Class hoàn hảo cho dữ liệu chỉ gồm tháng và năm như thời hạn thẻ, kỳ công, chu kỳ hóa đơn.
+- `expiryYearMonth.atEndOfMonth()`: Trả về ngày cuối cùng tương ứng của tháng đó (ngày 28, 29, 30, hoặc 31), tự động tính đúng cho năm nhuận.
+</details>
+
+---
+
+### 📌 Bài 3: Chuyển đổi múi giờ cho hệ thống Meeting
+- **Mục tiêu:** Hiểu sâu `ZonedDateTime`, `ZoneId`, và phương thức chuyển múi giờ cùng thời khắc `withZoneSameInstant()`.
+- **Yêu cầu kỹ thuật:**
+  - Khởi tạo lịch họp lúc `15:00` ngày `15/10/2026` theo giờ Việt Nam (`Asia/Ho_Chi_Minh` - UTC+7).
+  - Chuyển đổi lịch họp sang múi giờ của đối tác:
+    - Tokyo (`Asia/Tokyo` - UTC+9)
+    - New York (`America/New_York` - UTC-4 Daylight Saving Time)
+  - In ra giờ họp tương ứng với từng địa phương kèm thông tin múi giờ.
+
+<details>
+<summary><b>💡 Xem lời giải mẫu hoàn chỉnh (Click để mở)</b></summary>
+
+```java
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+
+public class GlobalMeetingSchedulerDemo {
+    public static void main(String[] args) {
+        // 1. Tạo lịch họp tại Việt Nam: 15:00 ngày 15/10/2026
+        LocalDateTime meetingLocal = LocalDateTime.of(2026, 10, 15, 15, 0);
+        ZoneId vnZone = ZoneId.of("Asia/Ho_Chi_Minh");
+        ZonedDateTime vnMeeting = ZonedDateTime.of(meetingLocal, vnZone);
+
+        // 2. Chuyển đổi sang múi giờ Tokyo và New York cùng một thời khắc thực tế
+        ZoneId tokyoZone = ZoneId.of("Asia/Tokyo");
+        ZonedDateTime tokyoMeeting = vnMeeting.withZoneSameInstant(tokyoZone);
+
+        ZoneId nyZone = ZoneId.of("America/New_York");
+        ZonedDateTime nyMeeting = vnMeeting.withZoneSameInstant(nyZone);
+
+        // 3. Format hiển thị
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss (z, Z)");
+
+        System.out.println("=== LỊCH HỌP TOÀN CẦU ===");
+        System.out.println("Việt Nam  : " + vnMeeting.format(formatter));
+        System.out.println("Tokyo     : " + tokyoMeeting.format(formatter));
+        System.out.println("New York  : " + nyMeeting.format(formatter));
+    }
+}
+```
+
+**Output mẫu:**
+```text
+=== LỊCH HỌP TOÀN CẦU ===
+Việt Nam  : 15/10/2026 15:00:00 (ICT, +0700)
+Tokyo     : 15/10/2026 17:00:00 (JST, +0900)
+New York  : 15/10/2026 04:00:00 (EDT, -0400)
+```
+
+**Giải thích chi tiết:**
+- `withZoneSameInstant(ZoneId)`: Giữ nguyên cùng một thời khắc thực tế (Instant) trên toàn cầu và chuyển đổi giờ hiển thị theo giờ địa phương của vùng đích.
+- Phân biệt với `withZoneSameLocal(ZoneId)`: hàm này giữ nguyên số `15:00` nhưng đổi mác múi giờ (nghĩa là cuộc họp bị dời sang 15:00 giờ New York, sai lệch thời gian họp chung).
+</details>
+
+---
+
+### 📌 Bài 4: Tính số ngày làm việc (Trừ Thứ 7 & Chủ Nhật)
+- **Mục tiêu:** Thao tác kiểm tra thứ trong tuần với `DayOfWeek`, duyệt khoảng ngày bằng vòng lặp (Java 8) hoặc luồng Stream `datesUntil` (Java 9+).
+- **Yêu cầu kỹ thuật:**
+  - Viết hàm `countWorkingDays(LocalDate start, LocalDate end)` tính số ngày làm việc (bỏ qua thứ 7 và chủ nhật).
+  - Ném `IllegalArgumentException` nếu `start.isAfter(end)`.
+
+<details>
+<summary><b>💡 Xem lời giải mẫu hoàn chỉnh (Click để mở)</b></summary>
+
+```java
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+
+public class WorkingDaysCalculatorDemo {
+
+    // Cách 1: Vòng lặp cơ bản (Tương thích chuẩn Java 8+)
+    public static long countWorkingDaysJava8(LocalDate start, LocalDate end) {
+        if (start.isAfter(end)) {
+            throw new IllegalArgumentException("Ngày bắt đầu không được sau ngày kết thúc!");
+        }
+
+        long count = 0;
+        LocalDate current = start;
+        while (!current.isAfter(end)) {
+            DayOfWeek dow = current.getDayOfWeek();
+            if (dow != DayOfWeek.SATURDAY && dow != DayOfWeek.SUNDAY) {
+                count++;
+            }
+            current = current.plusDays(1);
+        }
+        return count;
+    }
+
+    // Cách 2: Dùng Stream datesUntil (Từ Java 9+)
+    public static long countWorkingDaysJava9(LocalDate start, LocalDate end) {
+        if (start.isAfter(end)) {
+            throw new IllegalArgumentException("Ngày bắt đầu không được sau ngày kết thúc!");
+        }
+
+        return start.datesUntil(end.plusDays(1)) // Duyệt đến hết ngày end
+                .filter(d -> d.getDayOfWeek() != DayOfWeek.SATURDAY 
+                          && d.getDayOfWeek() != DayOfWeek.SUNDAY)
+                .count();
+    }
+
+    public static void main(String[] args) {
+        LocalDate start = LocalDate.of(2026, 10, 1); // Thứ 5
+        LocalDate end = LocalDate.of(2026, 10, 15);  // Thứ 5
+
+        System.out.println("Từ ngày: " + start + " đến ngày: " + end);
+        System.out.println("Số ngày làm việc (Java 8): " + countWorkingDaysJava8(start, end) + " ngày");
+        System.out.println("Số ngày làm việc (Java 9+ Stream): " + countWorkingDaysJava9(start, end) + " ngày");
+    }
+}
+```
+
+**Output mẫu:**
+```text
+Từ ngày: 2026-10-01 đến ngày: 2026-10-15
+Số ngày làm việc (Java 8): 11 ngày
+Số ngày làm việc (Java 9+ Stream): 11 ngày
+```
+
+**Giải thích chi tiết:**
+- Trong 15 ngày từ 01/10 đến 15/10/2026 có 2 ngày Thứ Bảy (ngày 03, 10) và 2 ngày Chủ Nhật (ngày 04, 11). Tổng cộng 4 ngày nghỉ, số ngày làm việc là $15 - 4 = 11$ ngày.
+- `start.datesUntil(end.plusDays(1))` sinh ra `Stream<LocalDate>` liên tục từ `start` đến trước cận trên, do đó ta cộng thêm 1 ngày vào `end` để tính cả ngày kết thúc.
+</details>
+
+---
+
+### 📌 Bài 5: Log Parser Timestamp
+- **Mục tiêu:** Parse chuỗi chuẩn ISO-8601 UTC (`Instant`), chuyển đổi sang `LocalDateTime` theo múi giờ hệ thống máy khách và định dạng lại hiển thị.
+- **Yêu cầu kỹ thuật:**
+  - Cho dòng log: `"2026-10-06T14:30:45.123Z [ERROR] Database timeout"`.
+  - Tách lấy chuỗi timestamp ISO.
+  - Parse thành `Instant`.
+  - Chuyển `Instant` thành `LocalDateTime` theo `ZoneId.systemDefault()`.
+  - Hiển thị theo định dạng `dd/MM/yyyy HH:mm:ss`.
+
+<details>
+<summary><b>💡 Xem lời giải mẫu hoàn chỉnh (Click để mở)</b></summary>
+
+```java
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+
+public class LogTimestampParserDemo {
+    public static void main(String[] args) {
+        String logLine = "2026-10-06T14:30:45.123Z [ERROR] Database timeout";
+
+        // 1. Tách chuỗi thời gian ISO trước dấu cách đầu tiên
+        int spaceIndex = logLine.indexOf(" ");
+        String isoTimestamp = logLine.substring(0, spaceIndex);
+        String logMessage = logLine.substring(spaceIndex + 1);
+
+        // 2. Parse thành Instant (chuẩn ISO-8601 có đuôi 'Z')
+        Instant instant = Instant.parse(isoTimestamp);
+
+        // 3. Chuyển thành LocalDateTime theo múi giờ hệ thống
+        ZoneId systemZone = ZoneId.systemDefault();
+        LocalDateTime localDateTime = LocalDateTime.ofInstant(instant, systemZone);
+
+        // 4. Định dạng hiển thị dd/MM/yyyy HH:mm:ss
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+        String formattedTime = localDateTime.format(formatter);
+
+        System.out.println("Chuỗi log ban đầu : " + logLine);
+        System.out.println("Múi giờ hệ thống  : " + systemZone);
+        System.out.println("Thời gian chuẩn hóa: " + formattedTime);
+        System.out.println("Nội dung thông báo: " + logMessage);
+    }
+}
+```
+
+**Output mẫu (Tại Việt Nam GMT+7):**
+```text
+Chuỗi log ban đầu : 2026-10-06T14:30:45.123Z [ERROR] Database timeout
+Múi giờ hệ thống  : Asia/Ho_Chi_Minh
+Thời gian chuẩn hóa: 06/10/2026 21:30:45
+Nội dung thông báo: [ERROR] Database timeout
+```
+
+**Giải thích chi tiết:**
+- Ký tự `Z` ở cuối chuỗi ISO đại diện cho UTC (Zulu time - độ lệch 0).
+- Khi đổi sang múi giờ `Asia/Ho_Chi_Minh` (UTC+7), thời gian tự động được cộng thêm 7 tiếng ($14:30 + 7h = 21:30$).
+- `Instant` là kiểu dữ liệu chuẩn mực nhất để lưu trữ timestamp trong cơ sở dữ liệu hoặc hệ thống log phân tán.
+</details>
 
 ---
 
 ## 10.3. Bài tập Lambda, Functional Interface & Method Reference
 
-**Bài 1: Filter Custom bằng Predicate**
-Tự định nghĩa một phương thức `public static <T> List<T> myFilter(List<T> list, Predicate<T> predicate)`. 
-Sử dụng hàm này để:
-- Lọc ra các số nguyên tố từ một `List<Integer>`.
-- Lọc ra các sinh viên có điểm > 8.0 từ một `List<Student>`.
+### 📌 Bài 1: Filter Custom bằng Predicate
+- **Mục tiêu:** Tự xây dựng phương thức tổng quát (Generic) nhận `Predicate<T>` để hiểu cách Lambda trừu tượng hóa điều kiện lọc.
+- **Yêu cầu kỹ thuật:**
+  - Định nghĩa `public static <T> List<T> myFilter(List<T> list, Predicate<T> predicate)`.
+  - Dùng hàm trên lọc ra:
+    - Các số nguyên tố từ `List<Integer>`.
+    - Các sinh viên có điểm > 8.0 từ `List<Student>`.
 
-**Bài 2: Tính toán động bằng Function & BiFunction**
-Viết một hệ thống tính lương đơn giản.
-- Dùng `Function<Double, Double>` để tính thuế thu nhập (ví dụ 10%).
-- Dùng `BiFunction<Double, Integer, Double>` để tính tổng lương = Lương cơ bản * Hệ số - Thuế.
+<details>
+<summary><b>💡 Xem lời giải mẫu hoàn chỉnh (Click để mở)</b></summary>
 
-**Bài 3: Pipeline xử lý String với UnaryOperator**
-Cho một `List<UnaryOperator<String>>` chứa các bước xử lý chuỗi: Xóa khoảng trắng 2 đầu -> Viết hoa toàn bộ -> Thay thế "JAVA" thành "JAVA 8+". 
-Viết chương trình duyệt qua List này và áp dụng tuần tự các thao tác lên một chuỗi input.
+```java
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.function.Predicate;
 
-**Bài 4: Chuyển đổi Collection bằng Method Reference**
-Cho một `List<String>` chứa các chuỗi số (VD: `["1", "2", "3"]`). Dùng Method Reference của `Integer` để biến đổi List này thành `List<Integer>`.
+public class CustomFilterPredicateDemo {
 
-**Bài 5: Consumer và Supplier kết hợp**
-Viết hàm `processWithLog(Supplier<String> dataSupplier, Consumer<String> dataConsumer)`. Hàm này sẽ lấy dữ liệu từ Supplier, in ra dòng log "Đang xử lý dữ liệu...", sau đó đưa dữ liệu vào Consumer để xử lý.
+    // 1. Tự định nghĩa hàm filter tổng quát nhận Predicate
+    public static <T> List<T> myFilter(List<T> list, Predicate<T> predicate) {
+        List<T> result = new ArrayList<>();
+        for (T item : list) {
+            if (predicate.test(item)) { // Gọi hàm kiểm tra trừu tượng
+                result.add(item);
+            }
+        }
+        return result;
+    }
+
+    // Hàm kiểm tra số nguyên tố
+    public static boolean isPrime(int n) {
+        if (n < 2) return false;
+        for (int i = 2; i <= Math.sqrt(n); i++) {
+            if (n % i == 0) return false;
+        }
+        return true;
+    }
+
+    // Class Student
+    static class Student {
+        private String name;
+        private double score;
+
+        public Student(String name, double score) {
+            this.name = name;
+            this.score = score;
+        }
+
+        public double getScore() { return score; }
+
+        @Override
+        public String toString() {
+            return name + " (" + score + ")";
+        }
+    }
+
+    public static void main(String[] args) {
+        // Test 1: Lọc số nguyên tố
+        List<Integer> numbers = Arrays.asList(2, 4, 7, 9, 11, 15, 17, 20);
+        // Dùng Method Reference CustomFilterPredicateDemo::isPrime
+        List<Integer> primes = myFilter(numbers, CustomFilterPredicateDemo::isPrime);
+        System.out.println("Các số nguyên tố: " + primes);
+
+        // Test 2: Lọc sinh viên điểm > 8.0
+        List<Student> students = Arrays.asList(
+                new Student("An", 8.5),
+                new Student("Bình", 7.0),
+                new Student("Cường", 9.2),
+                new Student("Dung", 6.8)
+        );
+        // Dùng Lambda Expression
+        List<Student> topStudents = myFilter(students, s -> s.getScore() > 8.0);
+        System.out.println("Sinh viên giỏi (> 8.0): " + topStudents);
+    }
+}
+```
+
+**Output mẫu:**
+```text
+Các số nguyên tố: [2, 7, 11, 17]
+Sinh viên giỏi (> 8.0): [An (8.5), Cường (9.2)]
+```
+
+**Giải thích chi tiết:**
+- `Predicate<T>` là Functional Interface nhận vào 1 đối tượng kiểu `T` và trả về `boolean` thông qua hàm `test(T t)`.
+- Nhờ Generic `<T>`, cùng một hàm `myFilter` có thể tái sử dụng cho mọi loại dữ liệu (`Integer`, `Student`, `Order`, ...), loại bỏ hoàn toàn việc lặp code duyệt mảng.
+</details>
+
+---
+
+### 📌 Bài 2: Tính toán động bằng Function & BiFunction
+- **Mục tiêu:** Áp dụng `Function<T, R>` và `BiFunction<T, U, R>` để xây dựng cơ chế tính lương linh hoạt, có thể thay đổi thuế động.
+- **Yêu cầu kỹ thuật:**
+  - Dùng `Function<Double, Double>` tính thuế thu nhập (VD: 10% nếu tổng thu nhập $\le$ 20 triệu, 20% nếu trên 20 triệu).
+  - Dùng `BiFunction<Double, Integer, Double>` nhận vào Lương cơ bản và Hệ số lương để tính Lương thực lĩnh = (Lương cơ bản * Hệ số) - Thuế.
+
+<details>
+<summary><b>💡 Xem lời giải mẫu hoàn chỉnh (Click để mở)</b></summary>
+
+```java
+import java.util.function.BiFunction;
+import java.util.function.Function;
+
+public class SalaryCalculationDemo {
+    public static void main(String[] args) {
+        // 1. Function tính thuế: Thu nhập > 20tr chịu thuế 20%, ngược lại 10%
+        Function<Double, Double> taxCalculator = grossSalary -> {
+            if (grossSalary > 20_000_000) {
+                return grossSalary * 0.20;
+            }
+            return grossSalary * 0.10;
+        };
+
+        // 2. BiFunction tính lương thực lĩnh: (Lương cơ bản, Hệ số) -> Lương sau thuế
+        BiFunction<Double, Integer, Double> netSalaryCalculator = (baseSalary, coefficient) -> {
+            double grossSalary = baseSalary * coefficient;
+            double tax = taxCalculator.apply(grossSalary); // Sử dụng Function thuế
+            return grossSalary - tax;
+        };
+
+        // Test tính lương
+        double base1 = 5_000_000;
+        int coef1 = 3; // Gross = 15 triệu -> Thuế 10% = 1.5 triệu -> Net = 13.5 triệu
+        System.out.printf("Nhân viên 1: Lương thực lĩnh = %, .0f VNĐ\n", netSalaryCalculator.apply(base1, coef1));
+
+        double base2 = 10_000_000;
+        int coef2 = 3; // Gross = 30 triệu -> Thuế 20% = 6 triệu -> Net = 24 triệu
+        System.out.printf("Nhân viên 2: Lương thực lĩnh = %, .0f VNĐ\n", netSalaryCalculator.apply(base2, coef2));
+    }
+}
+```
+
+**Output mẫu:**
+```text
+Nhân viên 1: Lương thực lĩnh =  13,500,000 VNĐ
+Nhân viên 2: Lương thực lĩnh =  24,000,000 VNĐ
+```
+
+**Giải thích chi tiết:**
+- `Function<T, R>`: Nhận 1 đối số kiểu `T`, trả về kết quả kiểu `R`.
+- `BiFunction<T, U, R>`: Nhận 2 đối số kiểu `T`, `U` và trả về kết quả kiểu `R`.
+- Logic tính thuế được đóng gói độc lập; nếu công ty thay đổi chính sách thuế (thuế lũy tiến từng phần), ta chỉ cần truyền một `Function` mới mà không phải sửa logic tính lương tổng quát.
+</details>
+
+---
+
+### 📌 Bài 3: Pipeline xử lý String với UnaryOperator
+- **Mục tiêu:** Áp dụng `UnaryOperator<String>` và chuỗi xử lý (Pipeline / Chain of Operations).
+- **Yêu cầu kỹ thuật:**
+  - Cho `List<UnaryOperator<String>>` gồm các bước:
+    1. Cắt khoảng trắng 2 đầu (`String::trim`).
+    2. Viết hoa toàn bộ chuỗi (`String::toUpperCase`).
+    3. Thay thế `"JAVA"` thành `"JAVA 8+"`.
+  - Viết chương trình duyệt qua danh sách và áp dụng lần lượt các thao tác lên chuỗi đầu vào.
+
+<details>
+<summary><b>💡 Xem lời giải mẫu hoàn chỉnh (Click để mở)</b></summary>
+
+```java
+import java.util.Arrays;
+import java.util.List;
+import java.util.function.UnaryOperator;
+
+public class StringPipelineDemo {
+    public static void main(String[] args) {
+        // 1. Định nghĩa Pipeline gồm các bước biến đổi dữ liệu
+        List<UnaryOperator<String>> pipeline = Arrays.asList(
+                String::trim,                             // Bước 1: Trim khoảng trắng
+                String::toUpperCase,                      // Bước 2: In hoa
+                s -> s.replace("JAVA", "JAVA 8+")        // Bước 3: Thay thế từ khóa
+        );
+
+        String rawInput = "   học lập trình java cùng chuyên gia!   ";
+        System.out.println("Input ban đầu: \"" + rawInput + "\"");
+
+        // Cách 1: Vòng lặp duyệt áp dụng tuần tự
+        String processed = rawInput;
+        for (UnaryOperator<String> step : pipeline) {
+            processed = step.apply(processed);
+        }
+        System.out.println("Kết quả sau pipeline (Vòng lặp) : \"" + processed + "\"");
+
+        // Cách 2: Kết hợp toán tử bằng andThen / Stream reduce
+        UnaryOperator<String> combinedPipeline = pipeline.stream()
+                .reduce(UnaryOperator.identity(), (f1, f2) -> s -> f2.apply(f1.apply(s)));
+        System.out.println("Kết quả sau pipeline (Combined)  : \"" + combinedPipeline.apply(rawInput) + "\"");
+    }
+}
+```
+
+**Output mẫu:**
+```text
+Input ban đầu: "   học lập trình java cùng chuyên gia!   "
+Kết quả sau pipeline (Vòng lặp) : "HỌC LẬP TRÌNH JAVA 8+ CÙNG CHUYÊN GIA!"
+Kết quả sau pipeline (Combined)  : "HỌC LẬP TRÌNH JAVA 8+ CÙNG CHUYÊN GIA!"
+```
+
+**Giải thích chi tiết:**
+- `UnaryOperator<T>` là trường hợp đặc biệt của `Function<T, T>`, khi kiểu dữ liệu đầu vào và kết quả đầu ra là **cùng một kiểu**.
+- Mô hình này là nền tảng của Middleware trong Web Server hoặc Data Sanitization Pipeline trong Clean Architecture.
+</details>
+
+---
+
+### 📌 Bài 4: Chuyển đổi Collection bằng Method Reference
+- **Mục tiêu:** Thành thạo cú pháp Static Method Reference `Integer::valueOf` / `Integer::parseInt` trong Stream API.
+- **Yêu cầu kỹ thuật:**
+  - Cho `List<String>` chuỗi số: `["1", "2", "3", "42", "99"]`.
+  - Biến đổi thành `List<Integer>` bằng Method Reference.
+
+<details>
+<summary><b>💡 Xem lời giải mẫu hoàn chỉnh (Click để mở)</b></summary>
+
+```java
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
+public class MethodReferenceCollectionDemo {
+    public static void main(String[] args) {
+        List<String> rawNumbers = Arrays.asList("1", "2", "3", "42", "99");
+
+        // Biến đổi List<String> sang List<Integer> bằng Method Reference
+        List<Integer> integers = rawNumbers.stream()
+                .map(Integer::valueOf) // Tương đương: s -> Integer.valueOf(s)
+                .collect(Collectors.toList());
+
+        System.out.println("Danh sách gốc (String) : " + rawNumbers);
+        System.out.println("Danh sách số (Integer) : " + integers);
+
+        // Tính tổng các số đã chuyển đổi
+        int sum = integers.stream().mapToInt(Integer::intValue).sum();
+        System.out.println("Tổng các số: " + sum);
+    }
+}
+```
+
+**Output mẫu:**
+```text
+Danh sách gốc (String) : [1, 2, 3, 42, 99]
+Danh sách số (Integer) : [1, 2, 3, 42, 99]
+Tổng các số: 147
+```
+
+**Giải thích chi tiết:**
+- `Integer::valueOf` là **Static Method Reference** (`ClassName::staticMethodName`). Trình biên dịch ngầm hiểu chuỗi `s` truyền vào sẽ đóng vai trò đối số của hàm `valueOf(s)`.
+- Ưu điểm so với `Integer::parseInt`: `valueOf()` tận dụng Integer Cache (từ -128 đến 127), giúp tiết kiệm cấp phát bộ nhớ Heap.
+</details>
+
+---
+
+### 📌 Bài 5: Consumer và Supplier kết hợp
+- **Mục tiêu:** Phối hợp cơ chế cấp phát dữ liệu lười (Lazy Evaluation) của `Supplier<T>` và cơ chế tiêu thụ của `Consumer<T>`.
+- **Yêu cầu kỹ thuật:**
+  - Viết hàm `processWithLog(Supplier<String> dataSupplier, Consumer<String> dataConsumer)`.
+  - Hàm sẽ lấy dữ liệu từ `Supplier`, in log trung gian "Đang xử lý dữ liệu...", sau đó giao cho `Consumer` tiêu thụ.
+
+<details>
+<summary><b>💡 Xem lời giải mẫu hoàn chỉnh (Click để mở)</b></summary>
+
+```java
+import java.util.UUID;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
+
+public class SupplierConsumerLoggerDemo {
+
+    public static void processWithLog(Supplier<String> dataSupplier, Consumer<String> dataConsumer) {
+        System.out.println("[LOG] Bắt đầu quy trình nạp dữ liệu...");
+        // 1. Chỉ khi gọi get(), logic sinh dữ liệu mới thực sự chạy (Lazy Evaluation)
+        String data = dataSupplier.get();
+
+        System.out.println("[LOG] Đang xử lý dữ liệu...");
+        // 2. Chuyển giao dữ liệu cho Consumer
+        dataConsumer.accept(data);
+
+        System.out.println("[LOG] Hoàn tất quy trình!\n");
+    }
+
+    public static void main(String[] args) {
+        // Trường hợp 1: Supplier sinh mã Token ngẫu nhiên, Consumer in hoa
+        Supplier<String> tokenSupplier = () -> "token_" + UUID.randomUUID();
+        Consumer<String> consolePrinter = token -> System.out.println(">>> Đã nhận mã bảo mật: " + token.toUpperCase());
+
+        processWithLog(tokenSupplier, consolePrinter);
+
+        // Trường hợp 2: Supplier đọc dữ liệu giả lập từ Database
+        Supplier<String> dbSupplier = () -> {
+            // Giả lập query DB
+            return "User Profile: {id: 101, username: 'nguyentienkhoi'}";
+        };
+        Consumer<String> auditConsumer = record -> System.out.println(">>> Lưu vào file Audit Log: " + record);
+
+        processWithLog(dbSupplier, auditConsumer);
+    }
+}
+```
+
+**Output mẫu:**
+```text
+[LOG] Bắt đầu quy trình nạp dữ liệu...
+[LOG] Đang xử lý dữ liệu...
+>>> Đã nhận mã bảo mật: TOKEN_4B6349FA-6C4B-4E38-B702-DF7E2C9FA84D
+[LOG] Hoàn tất quy trình!
+
+[LOG] Bắt đầu quy trình nạp dữ liệu...
+[LOG] Đang xử lý dữ liệu...
+>>> Lưu vào file Audit Log: User Profile: {id: 101, username: 'nguyentienkhoi'}
+[LOG] Hoàn tất quy trình!
+```
+
+**Giải thích chi tiết:**
+- `Supplier<T>`: Không nhận tham số đầu vào, cung cấp kết quả kiểu `T` (`T get()`). Dùng để tạo giá trị khi cần thiết (Lazy Loading, Object Factory).
+- `Consumer<T>`: Nhận vào tham số kiểu `T` nhưng không trả về gì (`void accept(T t)`). Dùng để in ấn, lưu database, gửi thông báo.
+</details>
 
 ---
 
 ## 10.4. Bài tập Stream API
 
-**Bài 1: Xử lý danh sách Sản phẩm (Product)**
-Cho `List<Product>` (id, name, price, category).
-- Lọc ra các sản phẩm thuộc category "Laptop" có giá > 15 triệu.
-- Sắp xếp kết quả theo giá giảm dần.
-- Lấy ra tên của 3 sản phẩm đầu tiên và nối thành chuỗi, cách nhau bởi dấu phẩy.
+### 📌 Bài 1: Xử lý danh sách Sản phẩm (Product)
+- **Mục tiêu:** Áp dụng liên hoàn các thao tác `filter()`, `sorted()`, `limit()`, `map()`, và gom chuỗi `Collectors.joining()`.
+- **Yêu cầu kỹ thuật:**
+  - Cho `List<Product>` (id, name, price, category).
+  - Lọc sản phẩm thuộc danh mục "Laptop" có giá > 15 triệu VNĐ.
+  - Sắp xếp giảm dần theo giá.
+  - Lấy tên của 3 sản phẩm đắt nhất và nối thành chuỗi cách nhau bởi dấu phẩy.
 
-**Bài 2: Gom nhóm (GroupingBy) Đơn hàng**
-Cho `List<Order>` (orderId, customerName, totalAmount, status).
-- Gom nhóm các đơn hàng theo `status` (PENDING, COMPLETED, CANCELLED).
-- Tính tổng tiền của tất cả các đơn hàng COMPLETED.
+<details>
+<summary><b>💡 Xem lời giải mẫu hoàn chỉnh (Click để mở)</b></summary>
 
-**Bài 3: Thống kê Điểm Sinh Viên (IntSummaryStatistics)**
-Cho mảng điểm `int[] scores = {5, 7, 8, 9, 4, 10, 6}`. Dùng Stream để tìm Điểm cao nhất, Điểm thấp nhất, và Điểm trung bình trong một lần chạy duy nhất.
+```java
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
 
-**Bài 4: Tìm hiểu flatMap**
-Cho một `List<Department>`, mỗi `Department` chứa một `List<Employee>`. Sử dụng `flatMap` để tạo ra một danh sách chứa TẤT CẢ các Employee trong công ty, sau đó lọc ra những người có số năm kinh nghiệm > 5.
+public class ProductStreamProcessingDemo {
 
-**Bài 5: Chữ cái xuất hiện nhiều nhất**
-Cho một chuỗi văn bản dài. Dùng Stream biến đổi chuỗi thành danh sách các ký tự, lọc bỏ khoảng trắng, gom nhóm để đếm tần suất mỗi ký tự, và tìm ra ký tự xuất hiện nhiều nhất.
+    static class Product {
+        private int id;
+        private String name;
+        private double price;
+        private String category;
+
+        public Product(int id, String name, double price, String category) {
+            this.id = id;
+            this.name = name;
+            this.price = price;
+            this.category = category;
+        }
+
+        public String getName() { return name; }
+        public double getPrice() { return price; }
+        public String getCategory() { return category; }
+    }
+
+    public static void main(String[] args) {
+        List<Product> products = Arrays.asList(
+                new Product(1, "MacBook Pro M3", 45_000_000, "Laptop"),
+                new Product(2, "Chuột Logitech MX Master", 2_200_000, "Phụ kiện"),
+                new Product(3, "Dell XPS 13", 28_000_000, "Laptop"),
+                new Product(4, "Asus ROG Zephyrus", 35_000_000, "Laptop"),
+                new Product(5, "HP Pavilion 14", 12_000_000, "Laptop"),
+                new Product(6, "Bàn phím cơ Keychron", 1_800_000, "Phụ kiện"),
+                new Product(7, "Lenovo ThinkPad X1", 32_000_000, "Laptop")
+        );
+
+        String result = products.stream()
+                // 1. Lọc: category "Laptop" và giá > 15 triệu
+                .filter(p -> "Laptop".equalsIgnoreCase(p.getCategory()) && p.getPrice() > 15_000_000)
+                // 2. Sắp xếp giảm dần theo giá
+                .sorted(Comparator.comparingDouble(Product::getPrice).reversed())
+                // 3. Lấy 3 sản phẩm hàng đầu
+                .limit(3)
+                // 4. Lấy ra tên sản phẩm
+                .map(Product::getName)
+                // 5. Nối chuỗi bằng dấu phẩy
+                .collect(Collectors.joining(", "));
+
+        System.out.println("Top 3 Laptop đắt nhất (> 15tr):");
+        System.out.println(result);
+    }
+}
+```
+
+**Output mẫu:**
+```text
+Top 3 Laptop đắt nhất (> 15tr):
+MacBook Pro M3, Asus ROG Zephyrus, Lenovo ThinkPad X1
+```
+
+**Giải thích chi tiết:**
+- `Comparator.comparingDouble(Product::getPrice).reversed()`: So sánh số thực và đảo chiều thứ tự để đạt sắp xếp giảm dần.
+- `Collectors.joining(", ")`: Bộ thu gom tối ưu của Stream giúp nối danh sách chuỗi kèm ký tự phân cách mà không bị thừa dấu phẩy ở phần tử cuối cùng.
+</details>
+
+---
+
+### 📌 Bài 2: Gom nhóm (GroupingBy) Đơn hàng
+- **Mục tiêu:** Nắm vững `Collectors.groupingBy()` và tính toán thống kê theo từng nhóm bằng Downstream Collector.
+- **Yêu cầu kỹ thuật:**
+  - Cho `List<Order>` (orderId, customerName, totalAmount, status).
+  - Gom nhóm các đơn hàng theo `status` (`PENDING`, `COMPLETED`, `CANCELLED`).
+  - Tính tổng tiền của tất cả các đơn hàng có trạng thái `COMPLETED`.
+
+<details>
+<summary><b>💡 Xem lời giải mẫu hoàn chỉnh (Click để mở)</b></summary>
+
+```java
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+public class OrderGroupingDemo {
+
+    static class Order {
+        private String orderId;
+        private String customerName;
+        private double totalAmount;
+        private String status;
+
+        public Order(String orderId, String customerName, double totalAmount, String status) {
+            this.orderId = orderId;
+            this.customerName = customerName;
+            this.totalAmount = totalAmount;
+            this.status = status;
+        }
+
+        public String getOrderId() { return orderId; }
+        public double getTotalAmount() { return totalAmount; }
+        public String getStatus() { return status; }
+
+        @Override
+        public String toString() {
+            return String.format("[%s: %, .0f VNĐ]", orderId, totalAmount);
+        }
+    }
+
+    public static void main(String[] args) {
+        List<Order> orders = Arrays.asList(
+                new Order("ORD01", "Khoi", 2_500_000, "COMPLETED"),
+                new Order("ORD02", "Hoa", 1_200_000, "PENDING"),
+                new Order("ORD03", "Nam", 4_800_000, "COMPLETED"),
+                new Order("ORD04", "Lan", 850_000, "CANCELLED"),
+                new Order("ORD05", "Minh", 3_100_000, "COMPLETED")
+        );
+
+        // 1. Gom nhóm danh sách đơn hàng theo trạng thái
+        Map<String, List<Order>> ordersByStatus = orders.stream()
+                .collect(Collectors.groupingBy(Order::getStatus));
+
+        System.out.println("=== DANH SÁCH ĐƠN HÀNG THEO TRẠNG THÁI ===");
+        ordersByStatus.forEach((status, orderList) -> {
+            System.out.println(status + " (" + orderList.size() + " đơn): " + orderList);
+        });
+
+        // 2. Tính tổng doanh thu các đơn hàng COMPLETED
+        double totalCompleted = orders.stream()
+                .filter(o -> "COMPLETED".equalsIgnoreCase(o.getStatus()))
+                .mapToDouble(Order::getTotalAmount)
+                .sum();
+
+        System.out.printf("\nTổng tiền các đơn hàng COMPLETED: %, .0f VNĐ\n", totalCompleted);
+
+        // Cách nâng cao: Tính tổng tiền từng nhóm trạng thái chỉ trong 1 dòng bằng Downstream Collector
+        Map<String, Double> revenueByStatus = orders.stream()
+                .collect(Collectors.groupingBy(
+                        Order::getStatus,
+                        Collectors.summingDouble(Order::getTotalAmount)
+                ));
+        System.out.println("\nTổng doanh thu theo từng trạng thái: " + revenueByStatus);
+    }
+}
+```
+
+**Output mẫu:**
+```text
+=== DANH SÁCH ĐƠN HÀNG THEO TRẠNG THÁI ===
+COMPLETED (3 đơn): [[ORD01:  2,500,000 VNĐ], [ORD03:  4,800,000 VNĐ], [ORD05:  3,100,000 VNĐ]]
+CANCELLED (1 đơn): [[ORD04:  850,000 VNĐ]]
+PENDING (1 đơn): [[ORD02:  1,200,000 VNĐ]]
+
+Tổng tiền các đơn hàng COMPLETED:  10,400,000 VNĐ
+
+Tổng doanh thu theo từng trạng thái: {COMPLETED=1.04E7, CANCELLED=850000.0, PENDING=1200000.0}
+```
+
+**Giải thích chi tiết:**
+- `Collectors.groupingBy(Order::getStatus)`: Tương đương mệnh đề `GROUP BY status` trong SQL, trả về `Map<K, List<V>>`.
+- `mapToDouble(Order::getTotalAmount).sum()`: Chuyển sang `DoubleStream` nguyên thủy để thực hiện phép cộng hiệu năng cao, tránh chi phí Autoboxing/Unboxing của kiểu `Double`.
+</details>
+
+---
+
+### 📌 Bài 3: Thống kê Điểm Sinh Viên (IntSummaryStatistics)
+- **Mục tiêu:** Sử dụng `summaryStatistics()` để lấy mọi thông số thống kê (Min, Max, Avg, Sum, Count) chỉ trong đúng 1 lượt duyệt duy nhất (Single Pass).
+- **Yêu cầu kỹ thuật:**
+  - Cho mảng `int[] scores = {5, 7, 8, 9, 4, 10, 6}`.
+  - Tìm Điểm cao nhất, Điểm thấp nhất và Điểm trung bình chỉ trong một lần chạy Stream.
+
+<details>
+<summary><b>💡 Xem lời giải mẫu hoàn chỉnh (Click để mở)</b></summary>
+
+```java
+import java.util.Arrays;
+import java.util.IntSummaryStatistics;
+
+public class StudentScoreStatisticsDemo {
+    public static void main(String[] args) {
+        int[] scores = {5, 7, 8, 9, 4, 10, 6};
+
+        // Thu thập toàn bộ thống kê trong 1 lần duyệt Stream duy nhất
+        IntSummaryStatistics stats = Arrays.stream(scores)
+                .summaryStatistics();
+
+        System.out.println("Mảng điểm gốc: " + Arrays.toString(scores));
+        System.out.println("Số lượng sinh viên : " + stats.getCount());
+        System.out.println("Điểm cao nhất (Max): " + stats.getMax());
+        System.out.println("Điểm thấp nhất (Min): " + stats.getMin());
+        System.out.printf("Điểm trung bình (Avg): %.2f\n", stats.getAverage());
+        System.out.println("Tổng điểm          : " + stats.getSum());
+    }
+}
+```
+
+**Output mẫu:**
+```text
+Mảng điểm gốc: [5, 7, 8, 9, 4, 10, 6]
+Số lượng sinh viên : 7
+Điểm cao nhất (Max): 10
+Điểm thấp nhất (Min): 4
+Điểm trung bình (Avg): 7.00
+Tổng điểm          : 49
+```
+
+**Giải thích chi tiết:**
+- Thay vì phải duyệt mảng 3 lần (1 lần tính max, 1 lần tính min, 1 lần tính average), `IntSummaryStatistics` chỉ cần độ phức tạp thời gian $O(N)$ đúng 1 lần chạy, tiết kiệm CPU đáng kể với tập dữ liệu lớn.
+</details>
+
+---
+
+### 📌 Bài 4: Tìm hiểu flatMap
+- **Mục tiêu:** Phân biệt ranh giới giữa `map()` và `flatMap()`, làm phẳng cấu trúc dữ liệu lồng nhau (1-to-N).
+- **Yêu cầu kỹ thuật:**
+  - Cho `List<Department>`, mỗi `Department` chứa `List<Employee>`.
+  - Dùng `flatMap` trích xuất danh sách tất cả các `Employee` của toàn công ty.
+  - Lọc ra những nhân viên có số năm kinh nghiệm > 5 năm.
+
+<details>
+<summary><b>💡 Xem lời giải mẫu hoàn chỉnh (Click để mở)</b></summary>
+
+```java
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
+public class FlatMapDepartmentDemo {
+
+    static class Employee {
+        private String name;
+        private int experienceYears;
+
+        public Employee(String name, int experienceYears) {
+            this.name = name;
+            this.experienceYears = experienceYears;
+        }
+
+        public String getName() { return name; }
+        public int getExperienceYears() { return experienceYears; }
+
+        @Override
+        public String toString() {
+            return name + " (" + experienceYears + " năm KN)";
+        }
+    }
+
+    static class Department {
+        private String name;
+        private List<Employee> employees;
+
+        public Department(String name, List<Employee> employees) {
+            this.name = name;
+            this.employees = employees;
+        }
+
+        public List<Employee> getEmployees() { return employees; }
+    }
+
+    public static void main(String[] args) {
+        Department itDept = new Department("IT", Arrays.asList(
+                new Employee("Tuấn", 6),
+                new Employee("Hải", 3),
+                new Employee("Phong", 8)
+        ));
+
+        Department hrDept = new Department("HR", Arrays.asList(
+                new Employee("Mai", 2),
+                new Employee("Trang", 7)
+        ));
+
+        List<Department> departments = Arrays.asList(itDept, hrDept);
+
+        // Sử dụng flatMap để gộp phẳng List<Employee> của các phòng ban
+        List<Employee> seniorEmployees = departments.stream()
+                // dept.getEmployees().stream() trả về Stream<Employee>
+                // flatMap gộp các Stream<Employee> con thành một Stream<Employee> duy nhất
+                .flatMap(dept -> dept.getEmployees().stream())
+                // Lọc nhân sự có > 5 năm kinh nghiệm
+                .filter(emp -> emp.getExperienceYears() > 5)
+                .collect(Collectors.toList());
+
+        System.out.println("Nhân sự cấp cao (> 5 năm kinh nghiệm) toàn công ty:");
+        seniorEmployees.forEach(emp -> System.out.println("- " + emp));
+    }
+}
+```
+
+**Output mẫu:**
+```text
+Nhân sự cấp cao (> 5 năm kinh nghiệm) toàn công ty:
+- Tuấn (6 năm KN)
+- Phong (8 năm KN)
+- Trang (7 năm KN)
+```
+
+**Giải thích chi tiết:**
+- `map(dept -> dept.getEmployees())` sẽ trả về `Stream<List<Employee>>` (dạng lồng nhau, không xử lý tiếp từng phần tử được).
+- `flatMap(dept -> dept.getEmployees().stream())` sẽ "làm phẳng" (flatten) các stream con thành một luồng `Stream<Employee>` liên tục.
+</details>
+
+---
+
+### 📌 Bài 5: Chữ cái xuất hiện nhiều nhất
+- **Mục tiêu:** Ứng dụng Stream API kết hợp gom nhóm, đếm tần suất (`Collectors.counting()`) và tìm giá trị lớn nhất theo thuộc tính Map (`Map.Entry.comparingByValue()`).
+- **Yêu cầu kỹ thuật:**
+  - Cho một chuỗi văn bản dài.
+  - Lọc bỏ khoảng trắng, chuẩn hóa chữ thường, đếm tần suất từng chữ cái.
+  - Tìm ký tự xuất hiện nhiều nhất và số lần xuất hiện.
+
+<details>
+<summary><b>💡 Xem lời giải mẫu hoàn chỉnh (Click để mở)</b></summary>
+
+```java
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+public class MostFrequentCharStreamDemo {
+    public static void main(String[] args) {
+        String text = "Java Stream API is elegant, declarative and extremely powerful!";
+
+        // 1. Chuyển đổi text thành Map tần suất các chữ cái (bỏ khoảng trắng và dấu câu)
+        Map<Character, Long> frequencyMap = text.chars()
+                .filter(Character::isLetter)                         // Chỉ giữ lại chữ cái
+                .mapToObj(c -> (char) Character.toLowerCase(c))     // Đưa về chữ thường
+                .collect(Collectors.groupingBy(
+                        Function.identity(),                         // Key: chính ký tự đó
+                        Collectors.counting()                        // Value: số lần xuất hiện
+                ));
+
+        System.out.println("Bảng thống kê tần suất ký tự: " + frequencyMap);
+
+        // 2. Tìm Entry có số lần xuất hiện (Value) lớn nhất
+        Map.Entry<Character, Long> mostFrequent = frequencyMap.entrySet().stream()
+                .max(Map.Entry.comparingByValue())
+                .orElse(null);
+
+        if (mostFrequent != null) {
+            System.out.printf("\nKý tự xuất hiện nhiều nhất: '%c' với %d lần xuất hiện.\n",
+                    mostFrequent.getKey(), mostFrequent.getValue());
+        }
+    }
+}
+```
+
+**Output mẫu:**
+```text
+Bảng thống kê tần suất ký tự: {a=7, c=1, d=1, e=6, g=1, i=3, j=1, l=3, m=1, n=2, o=1, p=2, r=4, s=2, t=3, u=1, v=2, w=1, x=1, y=1}
+
+Ký tự xuất hiện nhiều nhất: 'a' với 7 lần xuất hiện.
+```
+
+**Giải thích chi tiết:**
+- `text.chars()`: Trả về `IntStream` các mã ASCII/Unicode của từng ký tự trong chuỗi.
+- `Character::isLetter`: Loại bỏ dấu cách ` `, dấu phẩy `,`, dấu chấm than `!`.
+- `Map.Entry.comparingByValue()`: Comparator tiện ích dùng để so sánh các Entry theo giá trị Value (ở đây là số lần đếm `Long`).
+</details>
 
 ---
 
 ## 10.5. Bài tập Optional
 
-**Bài 1: Tránh NPE cơ bản**
-Viết hàm `public Optional<User> findUserById(int id)` giả lập tìm user trong DB. Nếu id = 1 thì trả về User(id=1, name="Khoi"), ngược lại rỗng. Trong hàm `main`, gọi hàm trên, in ra tên user nếu tìm thấy, nếu không in ra "User not found" (Dùng Optional API, cấm dùng if-else).
+### 📌 Bài 1: Tránh NPE cơ bản
+- **Mục tiêu:** Thay thế hoàn toàn thói quen kiểm tra `if (obj != null)` bằng tư duy Functional của Optional: `map()`, `orElse()`, `ifPresentOrElse()`.
+- **Yêu cầu kỹ thuật:**
+  - Viết hàm `public Optional<User> findUserById(int id)` giả lập tìm user trong DB (id = 1 trả về `User`, id khác trả về rỗng).
+  - Trong `main`, gọi hàm và in ra tên user nếu tìm thấy, hoặc `"User not found"` nếu không thấy. **Tuyệt đối không dùng câu lệnh `if-else`**.
 
-**Bài 2: Optional trong Object lồng nhau**
-Cho các class `Company` -> chứa `Department` -> chứa `Manager` -> chứa `String name`. (Tất cả đều dùng getter có thể trả về null).
-Viết hàm lấy tên Manager của một Company truyền vào. Dùng Optional `map` và `flatMap` để xử lý chuỗi này, nếu bất kỳ bước nào null, trả về "No Manager".
+<details>
+<summary><b>💡 Xem lời giải mẫu hoàn chỉnh (Click để mở)</b></summary>
 
-**Bài 3: Xử lý giá trị Default bằng orElseGet**
-Giả sử hàm lấy cấu hình từ database `getConfigFromDb()` rất chậm. Viết logic: Thử lấy cấu hình bằng biến môi trường (Environment Variable), bọc trong Optional. Nếu rỗng, dùng `orElseGet` để gọi hàm `getConfigFromDb()`.
+```java
+import java.util.Optional;
 
-**Bài 4: Ném Exception với Optional**
-Lấy một chuỗi số lượng sản phẩm từ API (có thể null). Bọc vào Optional. Biến đổi (map) chuỗi đó thành Integer. Nếu chuỗi rỗng hoặc lỗi, ném ra ngoại lệ `IllegalArgumentException("Invalid quantity")` bằng `orElseThrow`.
+public class AvoidNpeOptionalDemo {
 
-**Bài 5: Kết hợp Stream và Optional**
-Cho `List<Optional<String>>` chứa nhiều email (có cái có, có cái rỗng). Viết Stream để bóc tất cả các Optional có giá trị ra, nối chúng thành một chuỗi duy nhất cách nhau bởi dấu chấm phẩy `;`. Dùng hàm `flatMap(Optional::stream)` (có từ Java 9).
+    static class User {
+        private int id;
+        private String name;
+
+        public User(int id, String name) {
+            this.id = id;
+            this.name = name;
+        }
+
+        public String getName() { return name; }
+    }
+
+    // Giả lập tìm kiếm dữ liệu từ Database
+    public static Optional<User> findUserById(int id) {
+        if (id == 1) {
+            return Optional.of(new User(1, "Khoi"));
+        }
+        return Optional.empty(); // Không tìm thấy
+    }
+
+    public static void main(String[] args) {
+        // Cách 1: Dùng map() kết hợp orElse() (Trả về chuỗi mặc định)
+        String userName1 = findUserById(1)
+                .map(User::getName)
+                .orElse("User not found");
+        System.out.println("Kết quả ID = 1: " + userName1);
+
+        String userName2 = findUserById(99)
+                .map(User::getName)
+                .orElse("User not found");
+        System.out.println("Kết quả ID = 99: " + userName2);
+
+        // Cách 2: Dùng ifPresentOrElse() (Có từ Java 9+) - Thực thi Action không trả về
+        System.out.print("Kiểm tra ID = 1 qua Action: ");
+        findUserById(1).map(User::getName).ifPresentOrElse(
+                name -> System.out.println("Xin chào, " + name + "!"),
+                () -> System.out.println("User not found")
+        );
+    }
+}
+```
+
+**Output mẫu:**
+```text
+Kết quả ID = 1: Khoi
+Kết quả ID = 99: User not found
+Kiểm tra ID = 1 qua Action: Xin chào, Khoi!
+```
+
+**Giải thích chi tiết:**
+- `Optional.of(obj)`: Bọc đối tượng chắc chắn không null (nếu null sẽ quăng NPE ngay lập tức).
+- `Optional.empty()`: Đại diện cho giá trị rỗng thay vì dùng từ khóa `null`.
+- `map(User::getName)`: Tự động bỏ qua nếu Optional rỗng mà không bị NullPointerException.
+</details>
+
+---
+
+### 📌 Bài 2: Optional trong Object lồng nhau
+- **Mục tiêu:** Giải quyết bài toán "Kim tự tháp địa ngục" (Null-check Hell) trong các chuỗi đối tượng lồng nhau: `Company` $\rightarrow$ `Department` $\rightarrow$ `Manager` $\rightarrow$ `name`.
+- **Yêu cầu kỹ thuật:**
+  - Viết hàm lấy tên Manager của một Company truyền vào.
+  - Sử dụng Optional `map()` và `orElse()` để xử lý chuỗi truy cập, nếu bất kỳ mắt xích nào là null thì trả về `"No Manager"`.
+
+<details>
+<summary><b>💡 Xem lời giải mẫu hoàn chỉnh (Click để mở)</b></summary>
+
+```java
+import java.util.Optional;
+
+public class NestedObjectOptionalDemo {
+
+    static class Manager {
+        private String name;
+        public Manager(String name) { this.name = name; }
+        public String getName() { return name; }
+    }
+
+    static class Department {
+        private Manager manager;
+        public Department(Manager manager) { this.manager = manager; }
+        public Manager getManager() { return manager; }
+    }
+
+    static class Company {
+        private Department department;
+        public Company(Department department) { this.department = department; }
+        public Department getDepartment() { return department; }
+    }
+
+    // Hàm lấy tên Manager an toàn tuyệt đối với Optional
+    public static String getManagerName(Company company) {
+        return Optional.ofNullable(company)
+                .map(Company::getDepartment)  // Nếu company null -> Optional rỗng
+                .map(Department::getManager)  // Nếu department null -> Optional rỗng
+                .map(Manager::getName)        // Nếu manager null -> Optional rỗng
+                .orElse("No Manager");        // Giá trị dự phòng an toàn
+    }
+
+    public static void main(String[] args) {
+        // Case 1: Đầy đủ thông tin
+        Company c1 = new Company(new Department(new Manager("Nguyễn Tiến Khôi")));
+        System.out.println("Company 1 Manager: " + getManagerName(c1));
+
+        // Case 2: Department không có Manager (manager = null)
+        Company c2 = new Company(new Department(null));
+        System.out.println("Company 2 Manager: " + getManagerName(c2));
+
+        // Case 3: Company không có Department (department = null)
+        Company c3 = new Company(null);
+        System.out.println("Company 3 Manager: " + getManagerName(c3));
+
+        // Case 4: Bản thân Company là null
+        System.out.println("Company 4 Manager: " + getManagerName(null));
+    }
+}
+```
+
+**Output mẫu:**
+```text
+Company 1 Manager: Nguyễn Tiến Khôi
+Company 2 Manager: No Manager
+Company 3 Manager: No Manager
+Company 4 Manager: No Manager
+```
+
+**Giải thích chi tiết:**
+- Truyền thống: Bạn phải viết 4 tầng `if (company != null && company.getDepartment() != null && ...)`.
+- Với `Optional.ofNullable().map().map()`: Mã nguồn trở thành một dòng biểu thức thanh lịch, dễ bảo trì và hoàn toàn miễn nhiễm với NPE.
+</details>
+
+---
+
+### 📌 Bài 3: Xử lý giá trị Default bằng orElseGet
+- **Mục tiêu:** Hiểu rõ sự khác biệt chí mạng giữa `orElse()` (Eager Evaluation) và `orElseGet()` (Lazy Evaluation).
+- **Yêu cầu kỹ thuật:**
+  - Giả lập hàm lấy cấu hình từ Database `getConfigFromDb()` rất chậm và tốn tài nguyên.
+  - Viết logic thử lấy cấu hình từ Biến môi trường.
+  - Chứng minh `orElseGet()` chỉ gọi hàm Database khi biến môi trường thực sự không tồn tại.
+
+<details>
+<summary><b>💡 Xem lời giải mẫu hoàn chỉnh (Click để mở)</b></summary>
+
+```java
+import java.util.Optional;
+
+public class OrElseVsOrElseGetDemo {
+
+    // Giả lập hàm truy vấn CSDL tốn kém tài nguyên
+    public static String getConfigFromDb() {
+        System.out.println("   --> [DATABASE QUERY] Đang kết nối CSDL và đọc config (RẤT CHẬM)...");
+        return "DATABASE_DEFAULT_CONFIG";
+    }
+
+    public static void main(String[] args) {
+        String existingEnvConfig = "PRODUCTION_ENV_CONFIG";
+
+        System.out.println("=== THỬ NGHIỆM VỚI orElse() ===");
+        // orElse() LUÔN LUÔN thực thi biểu thức bên trong ngoặc bất kể Optional có giá trị hay không!
+        String res1 = Optional.ofNullable(existingEnvConfig)
+                .orElse(getConfigFromDb());
+        System.out.println("Kết quả: " + res1);
+
+        System.out.println("\n=== THỬ NGHIỆM VỚI orElseGet() ===");
+        // orElseGet() nhận Supplier và CHỈ GỌI khi Optional thực sự rỗng (Lazy Evaluation)
+        String res2 = Optional.ofNullable(existingEnvConfig)
+                .orElseGet(() -> getConfigFromDb());
+        System.out.println("Kết quả: " + res2);
+
+        System.out.println("\n=== THỬ NGHIỆM KHI BIẾN MÔI TRƯỜNG LÀ NULL ===");
+        String nullEnvConfig = null;
+        String res3 = Optional.ofNullable(nullEnvConfig)
+                .orElseGet(() -> getConfigFromDb());
+        System.out.println("Kết quả: " + res3);
+    }
+}
+```
+
+**Output mẫu:**
+```text
+=== THỬ NGHIỆM VỚI orElse() ===
+   --> [DATABASE QUERY] Đang kết nối CSDL và đọc config (RẤT CHẬM)...
+Kết quả: PRODUCTION_ENV_CONFIG
+
+=== THỬ NGHIỆM VỚI orElseGet() ===
+Kết quả: PRODUCTION_ENV_CONFIG
+
+=== THỬ NGHIỆM KHI BIẾN MÔI TRƯỜNG LÀ NULL ===
+   --> [DATABASE QUERY] Đang kết nối CSDL và đọc config (RẤT CHẬM)...
+Kết quả: DATABASE_DEFAULT_CONFIG
+```
+
+**Giải thích chi tiết:**
+- Nhìn vào Output: Khi `existingEnvConfig` đã có dữ liệu, `orElse()` vẫn chạy dòng log `[DATABASE QUERY]`! Đây là bẫy hiệu năng kinh điển khiến ứng dụng chậm chạp mà nhiều lập trình viên không nhận ra.
+- **Quy tắc vàng:**
+  - Dùng `orElse("default string")` khi giá trị mặc định là một hằng số có sẵn, không tốn chi phí tính toán.
+  - Luôn dùng `orElseGet(() -> computeDefault())` khi giá trị mặc định cần gọi hàm, tạo object mới (`new Object()`), hoặc truy vấn I/O.
+</details>
+
+---
+
+### 📌 Bài 4: Ném Exception với Optional
+- **Mục tiêu:** Sử dụng `orElseThrow()` để biến việc kiểm tra dữ liệu không hợp lệ thành ngoại lệ nghiệp vụ một cách tường minh.
+- **Yêu cầu kỹ thuật:**
+  - Nhận chuỗi số lượng từ API (có thể là `null`, rỗng, hoặc không phải số).
+  - Bọc vào `Optional`, biến đổi thành `Integer`, kiểm tra $\ge 0$.
+  - Nếu không hợp lệ, ném ra ngoại lệ `IllegalArgumentException("Invalid quantity")`.
+
+<details>
+<summary><b>💡 Xem lời giải mẫu hoàn chỉnh (Click để mở)</b></summary>
+
+```java
+import java.util.Optional;
+
+public class ThrowExceptionOptionalDemo {
+
+    public static int parseQuantity(String quantityStr) {
+        return Optional.ofNullable(quantityStr)
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .map(s -> {
+                    try {
+                        return Integer.parseInt(s);
+                    } catch (NumberFormatException e) {
+                        return null; // Trả về null nếu không phải số để filter lọc bỏ
+                    }
+                })
+                .filter(q -> q != null && q >= 0) // Số lượng phải >= 0
+                .orElseThrow(() -> new IllegalArgumentException("Invalid quantity: \"" + quantityStr + "\""));
+    }
+
+    public static void main(String[] args) {
+        // Test case hợp lệ
+        System.out.println("Parsed valid: " + parseQuantity(" 15 "));
+
+        // Test cases không hợp lệ
+        testException(null);
+        testException("   ");
+        testException("abc");
+        testException("-5");
+    }
+
+    private static void testException(String input) {
+        try {
+            parseQuantity(input);
+        } catch (IllegalArgumentException e) {
+            System.out.println("Bắt ngoại lệ thành công: " + e.getMessage());
+        }
+    }
+}
+```
+
+**Output mẫu:**
+```text
+Parsed valid: 15
+Bắt ngoại lệ thành công: Invalid quantity: "null"
+Bắt ngoại lệ thành công: Invalid quantity: "   "
+Bắt ngoại lệ thành công: Invalid quantity: "abc"
+Bắt ngoại lệ thành công: Invalid quantity: "-5"
+```
+
+**Giải thích chi tiết:**
+- `filter(Predicate)`: Nếu điều kiện đúng, giữ nguyên Optional; nếu sai, biến Optional thành `Optional.empty()`.
+- `orElseThrow(Supplier<? extends X>)`: Ném ra ngoại lệ do bạn định nghĩa khi Optional rỗng, giúp loại bỏ hoàn toàn các khối `if (data == null) throw new ...` rườm rà.
+</details>
+
+---
+
+### 📌 Bài 5: Kết hợp Stream và Optional
+- **Mục tiêu:** Nắm vững kỹ thuật giải phóng giá trị từ danh sách `List<Optional<T>>` bằng `flatMap(Optional::stream)` trong Java 9+ và kỹ thuật tương đương trên Java 8.
+- **Yêu cầu kỹ thuật:**
+  - Cho `List<Optional<String>>` chứa nhiều email (bao gồm cả các phần tử rỗng).
+  - Tách lấy toàn bộ các email hợp lệ và nối thành một chuỗi duy nhất phân cách bởi dấu chấm phẩy `; `.
+
+<details>
+<summary><b>💡 Xem lời giải mẫu hoàn chỉnh (Click để mở)</b></summary>
+
+```java
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+public class StreamOptionalIntegrationDemo {
+    public static void main(String[] args) {
+        List<Optional<String>> emailList = Arrays.asList(
+                Optional.of("khoi@tayjava.vn"),
+                Optional.empty(),
+                Optional.of("admin@google.com"),
+                Optional.empty(),
+                Optional.of("contact@openai.com")
+        );
+
+        // Cách 1: Sử dụng flatMap(Optional::stream) - Chuẩn hiện đại từ Java 9+
+        String resultJava9 = emailList.stream()
+                .flatMap(Optional::stream) // Tự động bung giá trị nếu có, bỏ qua nếu empty
+                .collect(Collectors.joining("; "));
+
+        System.out.println("Kết quả (Java 9+ flatMap Optional::stream):");
+        System.out.println(resultJava9);
+
+        // Cách 2: Chuẩn tương thích Java 8
+        String resultJava8 = emailList.stream()
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(Collectors.joining("; "));
+
+        System.out.println("\nKết quả (Java 8 filter + map):");
+        System.out.println(resultJava8);
+    }
+}
+```
+
+**Output mẫu:**
+```text
+Kết quả (Java 9+ flatMap Optional::stream):
+khoi@tayjava.vn; admin@google.com; contact@openai.com
+
+Kết quả (Java 8 filter + map):
+khoi@tayjava.vn; admin@google.com; contact@openai.com
+```
+
+**Giải thích chi tiết:**
+- Trong Java 9, class `Optional` được bổ sung phương thức `stream()`:
+  - Nếu `Optional` chứa giá trị `x`, `optional.stream()` trả về `Stream.of(x)`.
+  - Nếu `Optional` rỗng, `optional.stream()` trả về `Stream.empty()`.
+- Khi kết hợp với `flatMap()`, toàn bộ các `Stream` con được nối phẳng lại, tự động loại bỏ các `Optional.empty()` một cách cực kỳ tinh tế và an toàn, không cần gọi `filter(Optional::isPresent)` thủ công.
+</details>
